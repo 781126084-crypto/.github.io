@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#070707">
+  <meta name="description" content="可持续生成、编辑与复盘的长期训练控制台。"><title>CARBON 长期训练控制台</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23070707'/%3E%3Cpath d='M14 18h36v9H23v10h27v9H14z' fill='%23ff4a3d'/%3E%3C/svg%3E"><link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<main class="app-shell">
+  <header class="topbar"><div class="brand"><div class="brand-mark" aria-hidden="true">C</div><div><div class="brand-name">CARBON / TRAIN</div><div class="brand-sub">LONG-TERM TRAINING SYSTEM</div></div></div><div class="status-pill"><span class="status-dot"></span><span>计划与记录保存在当前浏览器</span></div></header>
+  <nav class="nav-tabs" aria-label="页面导航"><button class="nav-btn active" data-view="today">本周执行</button><button class="nav-btn" data-view="plan">训练编排</button><button class="nav-btn" data-view="report">周报与调整</button><button class="nav-btn" data-view="targets">目标肌群与饮食</button></nav>
+
+  <section class="view active" id="view-today">
+    <div class="week-hero"><div><div class="eyebrow" id="weekEyebrow"></div><h1 id="weekTitle"></h1><p class="week-summary" id="weekSummary"></p><div class="hero-actions"><button class="ghost-btn" id="editWeekHero" type="button">编辑本周重点</button><button class="ghost-btn accent" id="addWeekHero" type="button">＋ 生成下一周</button></div></div><div class="hero-reason"><span class="tag" id="weekLoadTag"></span><strong>为什么这样安排</strong><p id="weekReason"></p><div class="hero-metric"><div class="ring" id="completionRing"><span id="completionPercent">0%</span></div><div class="metric-copy"><strong id="completionCount">0 / 4</strong><small>本周训练完成</small></div></div></div></div>
+    <div class="control-row"><div class="section-title"><h2>本周排布</h2><p>拖动卡片调序；手机可用左右箭头移动。休息日也能换位置。</p></div><div class="week-switcher-wrap"><div class="week-switcher" id="weekSwitcher"></div><button class="add-week-btn" id="addWeek" type="button" aria-label="生成下一周">＋</button></div></div>
+    <div class="day-grid" id="dayGrid" aria-label="一周训练日"></div>
+    <div class="detail-layout"><article class="panel panel-pad" id="dayDetail"></article><aside class="panel panel-pad log-card"><div class="card-head"><div><h3>训练反馈</h3><p>用你能直接感受到的状态决定下周怎么调。</p></div></div><form id="logForm"><div class="form-grid">
+      <label class="checkbox-row field full"><input type="checkbox" id="completedInput"><span>今天已完成</span></label>
+      <div class="field full"><label for="sleepInput">昨晚睡了多久</label><div class="suffix-input"><input id="sleepInput" type="number" min="0" max="12" step="0.5" placeholder="7.5"><span>小时</span></div></div>
+      <div class="field full"><label for="sorenessInput">今天肌肉酸痛</label><select id="sorenessInput"><option value="">选择最接近的感受</option><option value="low">低：几乎不影响活动</option><option value="medium">中：能感觉到，但动作正常</option><option value="high">高：影响走路、抬手或训练</option></select></div>
+      <div class="field full"><label for="finishInput">这次训练完成得怎么样</label><select id="finishInput"><option value="">选择最接近的情况</option><option value="easy">轻松完成，还有明显余力</option><option value="just">正好完成，最后几次仍稳定</option><option value="form_break">勉强完成，最后几次动作变形</option></select></div>
+      <div class="field full"><label for="bodyInput">肩颈和髋的感觉</label><select id="bodyInput"><option value="">选择最接近的情况</option><option value="smooth">肩颈、髋都顺畅</option><option value="tight_ok">有点紧，但不影响动作</option><option value="limited">明显受限或出现疼痛</option></select></div>
+      <div class="field full"><label for="notesInput">重量、次数或要提醒自己的事</label><textarea id="notesInput" placeholder="例：下拉 4 片完成 10/10/9；左肩略紧，但不影响动作。"></textarea></div>
+    </div><button class="primary-btn" type="submit">保存本日记录</button><div class="save-note" id="saveNote" role="status"></div></form></aside></div>
+    <section class="goal-strip-section"><div class="section-title"><h2>不要练偏的四个提醒</h2><p>每次选动作前，先确认它是否服务于肩宽、V 形、上胸和肩胛稳定。</p></div><div class="goal-grid compact-goals" id="quickGoals"></div></section>
+  </section>
+
+  <section class="view" id="view-plan">
+    <div class="plan-header"><div class="section-title"><div class="eyebrow">PROGRAM BUILDER</div><h2>长期训练编排</h2><p>没有“四周结束”。每一周都从上一周反馈生成，再由你拖动、替换或编辑。</p></div><button class="primary-btn compact" id="addWeekPlan" type="button">＋ 生成下一周</button></div>
+    <div class="timeline" id="timeline"></div>
+    <article class="panel panel-pad week-editor"><div class="week-editor-head"><div><div class="eyebrow" id="planWeekLabel"></div><h2 id="planWeekTitle"></h2><p id="planWeekLogic"></p></div><button class="ghost-btn" id="editWeekPlan" type="button">编辑周重点</button></div><div class="editor-help"><span>↕ 拖动卡片交换日期</span><span>✎ 编辑肌群和动作</span><span>↔ 手机用箭头移动</span></div><div class="plan-grid" id="planGrid"></div></article>
+  </section>
+
+  <section class="view" id="view-report">
+    <div class="control-row"><div class="section-title"><div class="eyebrow">WEEKLY REVIEW</div><h2>周报与下一周</h2><p>不靠抽象分数，只看完成、睡眠和清晰可感的身体信号。</p></div><select id="reportWeekSelect" class="week-btn" aria-label="选择要查看的周"></select></div>
+    <div class="report-grid" id="reportStats"></div><div class="recommendation" id="recommendationCard"></div>
+    <div class="rule-list"><div class="rule-card"><span class="status-chip green">推进</span><h4>只加一个变量</h4><p>完成稳定、睡眠尚可、身体顺畅：优先每组加 1 次；到次数上限后再小幅加重量。</p></div><div class="rule-card"><span class="status-chip amber">保持</span><h4>重复并做得更稳</h4><p>状态普通或记录不足：动作、组数和重量先不变，把最后几次也做稳。</p></div><div class="rule-card"><span class="status-chip red">减量</span><h4>减少约 20% 总量</h4><p>明显酸痛、动作变形、身体受限或连续睡眠不足：每个动作少 1 组，不硬顶。</p></div></div>
+  </section>
+
+  <section class="view" id="view-targets">
+    <div class="section-title"><div class="eyebrow">PHYSIQUE MAP</div><h2>你真正需要反复练的部位</h2><p>训练资源优先投入能改变肩腰比、V 形和上身立体感的部位。</p></div><div class="goal-grid" id="goalGrid"></div>
+    <div class="nutrition-layout"><article class="panel panel-pad"><div class="section-title"><h2>每天守住这三个数字</h2><p>先稳定执行，再根据腰围、7 日均重和训练表现调整总热量。</p></div><div class="targets"><div class="target-card"><strong>120g</strong><span>蛋白质</span></div><div class="target-card"><strong>500g</strong><span>蔬菜，深色占一半</span></div><div class="target-card"><strong>250g</strong><span>完整水果</span></div></div><div class="simple-food-guide"><div><span>训练日</span><strong>蛋白质不变，主食约 1.5 拳 / 餐</strong></div><div><span>休息日</span><strong>蛋白质不变，主食约 1 拳 / 餐</strong></div><div><span>外卖</span><strong>1.5–2 掌蛋白质 ＋ 2 拳蔬菜</strong></div></div><p class="method-note">蛋白质为约值，品牌、烹调和生熟重会造成差异。若有肾脏疾病或医学饮食限制，应先咨询临床专业人员。</p></article>
+    <aside class="panel panel-pad"><div class="protein-total"><div><div class="eyebrow">DAILY BUILDER</div><h3>四类食物就够了</h3></div><div><strong id="proteinTotal">120g</strong><div class="protein-status" id="proteinStatus"></div></div></div><div class="protein-foods" id="proteinFoods"></div><button class="secondary-btn" id="resetProtein" type="button">恢复接近 120g 的示例</button></aside></div>
+    <p class="method-note">训练量参考 <a href="https://www.acsm.org/wp-content/uploads/2026/03/Resistance-Training-Position-Stand-infographic.pdf" target="_blank" rel="noreferrer">ACSM 阻力训练建议</a>；蛋白质目标参考 <a href="https://pubmed.ncbi.nlm.nih.gov/28698222/" target="_blank" rel="noreferrer">阻力训练与蛋白质荟萃分析</a>。</p>
+  </section>
+  <footer class="footer"><span>CARBON · 长期训练控制台</span><span>出现放射痛、麻木、无力、眩晕或持续加重的夜间痛时，停止训练并就医。</span></footer>
+</main>
+
+<dialog id="weekDialog" class="edit-dialog"><form method="dialog" id="weekForm"><div class="dialog-head"><div><div class="eyebrow">EDIT WEEK</div><h2>编辑本周重点</h2></div><button class="icon-btn" value="cancel" aria-label="关闭">×</button></div><div class="dialog-body form-grid"><div class="field full"><label for="weekNameInput">周重点（短标题）</label><input id="weekNameInput" maxlength="24"></div><div class="field full"><label for="weekTitleInput">这一周的一句话目标</label><input id="weekTitleInput" maxlength="60"></div><div class="field full"><label for="weekReasonInput">为什么这样安排</label><textarea id="weekReasonInput" maxlength="260"></textarea></div></div><div class="dialog-actions"><button class="ghost-btn" value="cancel">取消</button><button class="primary-btn compact" id="saveWeekEdit" value="default">保存</button></div></form></dialog>
+
+<dialog id="dayDialog" class="edit-dialog wide"><form method="dialog" id="dayForm"><div class="dialog-head"><div><div class="eyebrow">EDIT DAY</div><h2 id="dayDialogTitle">编辑训练日</h2></div><button class="icon-btn" value="cancel" aria-label="关闭">×</button></div><div class="dialog-body"><div class="form-grid"><div class="field"><label for="dayTypeInput">模块类型</label><select id="dayTypeInput"><option value="train">训练</option><option value="rest">恢复</option></select></div><div class="field"><label for="dayNameInput">当天主题</label><input id="dayNameInput" maxlength="36"></div><div class="field full"><label for="dayFocusInput">当天目的</label><input id="dayFocusInput" maxlength="70"></div><div class="field full"><label for="dayMusclesInput">核心肌群（用顿号或逗号分隔）</label><input id="dayMusclesInput" maxlength="180"></div></div><div id="trainEditor"><div class="editor-section-head"><div><h3>主训练 · 最多 5 个动作</h3><p>先选核心肌群，再筛选动作；也可以直接输入自己的动作。</p></div><button class="ghost-btn" id="addExercise" type="button">＋ 加动作</button></div><div class="exercise-editor-list" id="exerciseEditorList"></div></div><div class="editor-section-head"><div><h3>独立辅助 · 20–30 分钟</h3><p>保留 3 个动作，每个动作写清楚怎么做和做多久。</p></div></div><div class="mobility-editor-list" id="mobilityEditorList"></div></div><div class="dialog-actions"><button class="ghost-btn" value="cancel">取消</button><button class="primary-btn compact" id="saveDayEdit" value="default">保存当天</button></div></form></dialog>
+
+<script src="./app.js"></script>
+</body></html>
