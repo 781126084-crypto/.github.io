@@ -124,7 +124,10 @@ const profilePresets = {
   posture: [
     {id:"shoulder",title:"肩颈与圆肩",caption:"胸椎、肩胛上旋与后侧稳定",pattern:["pull","quad","shoulderRest","push","shoulderRest","posterior","resetRest"],priorities:["中下斜方 / 菱形肌","前锯肌 / 肩袖","三角肌后束","背阔肌 / 大圆肌","腹部抗旋转 / 抗伸展","三角肌中束","臀腿后链","上胸锁骨部"]},
     {id:"hip",title:"髋胯与骨盆",caption:"髋旋转、臀部控制与核心稳定",pattern:["quad","pull","hipRest","posterior","hipRest","push","resetRest"],priorities:["臀腿后链","腹部抗旋转 / 抗伸展","前锯肌 / 肩袖","中下斜方 / 菱形肌","背阔肌 / 大圆肌","三角肌后束","三角肌中束","上胸锁骨部"]},
-    {id:"whole",title:"全身重新校准",caption:"肩胛、胸椎、髋与动作轨迹",pattern:["pull","quad","shoulderRest","push","hipRest","posterior","resetRest"],priorities:["前锯肌 / 肩袖","中下斜方 / 菱形肌","臀腿后链","腹部抗旋转 / 抗伸展","三角肌后束","背阔肌 / 大圆肌","三角肌中束","上胸锁骨部"]}
+    {id:"whole",title:"全身重新校准",caption:"肩胛、胸椎、髋与动作轨迹",pattern:["pull","quad","shoulderRest","push","hipRest","posterior","resetRest"],priorities:["前锯肌 / 肩袖","中下斜方 / 菱形肌","臀腿后链","腹部抗旋转 / 抗伸展","三角肌后束","背阔肌 / 大圆肌","三角肌中束","上胸锁骨部"]},
+    {id:"headneck",title:"头前伸 / 胸椎",caption:"颈深屈肌、胸椎伸展与肩胛协同",pattern:["pull","quad","shoulderRest","push","shoulderRest","posterior","resetRest"],priorities:["中下斜方 / 菱形肌","前锯肌 / 肩袖","三角肌后束","腹部抗旋转 / 抗伸展","背阔肌 / 大圆肌","三角肌中束","臀腿后链","上胸锁骨部"]},
+    {id:"asymmetry",title:"高低肩 / 肩胛差异",caption:"左右控制、上斜方代偿与肩胛贴合",pattern:["pull","posterior","shoulderRest","quad","shoulderRest","push","resetRest"],priorities:["前锯肌 / 肩袖","中下斜方 / 菱形肌","三角肌后束","腹部抗旋转 / 抗伸展","背阔肌 / 大圆肌","三角肌中束","臀腿后链","上胸锁骨部"]},
+    {id:"breath",title:"呼吸 / 胸廓 / 核心",caption:"胸廓展开、肋骨控制与抗伸展稳定",pattern:["push","quad","shoulderRest","pull","hipRest","posterior","resetRest"],priorities:["腹部抗旋转 / 抗伸展","前锯肌 / 肩袖","中下斜方 / 菱形肌","臀腿后链","三角肌后束","背阔肌 / 大圆肌","三角肌中束","上胸锁骨部"]}
   ]
 };
 
@@ -150,7 +153,9 @@ const state = {
   logs: storedLogsV2 || migratedLegacyLogs,
   food: safeParse("carbonProteinBuilderV2", null) || Object.fromEntries(foodCategories.map(f => [f.id,{count:f.defaultCount,variant:f.defaultVariant}])),
   profile: safeParse("carbonProfileV1", null),
-  goalPriorities: safeParse("carbonGoalPrioritiesV1", null) || goals.map((g,index)=>({...g,score:10-index}))
+  goalPriorities: safeParse("carbonGoalPrioritiesV1", null) || goals.map((g,index)=>({...g,score:10-index})),
+  mbti: localStorage.getItem("carbonMbtiV1") || "",
+  priorityNote: localStorage.getItem("carbonPriorityNoteV1") || "当前顺序来自目标建档；开始记录后会按训练覆盖量自动校准。"
 };
 if (!storedLogsV2 && Object.keys(migratedLegacyLogs).length) localStorage.setItem("carbonTrainingLogsV2",JSON.stringify(migratedLegacyLogs));
 state.week = Math.max(1, Math.min(state.week,state.weeks.length));
@@ -246,8 +251,8 @@ function renderProfileResult(){
   const box=$("#profileResult"); if(!box)return;
   const profile=state.profile;
   if(!profile){box.innerHTML=`<div class="profile-empty"><div class="empty-orbit"><span></span></div><div class="eyebrow">WAITING FOR SIGNAL</div><h2>你的训练重点还没被计算。</h2><p>先选目标方向。目标图、正背面照片和数据越完整，优先级越贴近你。</p><div class="empty-checks"><span>01 目标结构</span><span>02 当前基础</span><span>03 四周路径</span></div></div>`;return;}
-  const preset=findPreset(profile.mode,profile.preset), top=state.goalPriorities.slice(0,4);
-  box.innerHTML=`<div class="result-card"><div class="visual-head"><div><div class="eyebrow">PROFILE LOCKED</div><h2>${preset.title}</h2></div><span class="status-chip green">已同步计划</span></div><p>${profilePriorityReason(profile,preset)}</p>${bodyMapSvg(top.map(x=>x.title),"profile")}<div class="priority-stack">${top.map((item,index)=>`<div><span>0${index+1}</span><strong>${item.title}</strong><small>投入 ${item.score}/10</small></div>`).join("")}</div><div class="profile-mini-data"><span>${profile.mode==="muscle"?"增肌塑形":"体态调整"}</span><span>${profile.weight?`${profile.weight} kg`:"体重未填"}</span><span>${profile.trainingAge==="experienced"?"1 年以上":profile.trainingAge==="regular"?"3–12 个月":"起步阶段"}</span></div>${profileImages.goal?`<div class="reference-thumb"><img src="${profileImages.goal}" alt="目标参考"><span>目标参考</span></div>`:""}</div>`;
+  const preset=findPreset(profile.mode,profile.preset), top=state.goalPriorities.slice(0,3);
+  box.innerHTML=`<div class="result-card"><div class="visual-head"><div><div class="eyebrow">PROFILE LOCKED</div><h2>${preset.title}</h2></div><span class="status-chip green">已同步计划</span></div><p>${profilePriorityReason(profile,preset)}</p>${bodyMapSvg(top.map(x=>x.title),"profile")}<div class="priority-stack">${top.map((item,index)=>`<div><span>0${index+1}</span><strong>${item.title}</strong><small>${index===0?"主重点":"支持位"}</small></div>`).join("")}</div><div class="profile-mini-data"><span>${profile.mode==="muscle"?"增肌塑形":"体态调整"}</span><span>${profile.weight?`${profile.weight} kg`:"体重未填"}</span><span>${profile.trainingAge==="experienced"?"1 年以上":profile.trainingAge==="regular"?"3–12 个月":"起步阶段"}</span></div>${profileImages.goal?`<div class="reference-thumb"><img src="${profileImages.goal}" alt="目标参考"><span>目标参考</span></div>`:""}</div>`;
 }
 function renderProfile(){
   const profile=state.profile, mode=profile?.mode||document.querySelector('input[name="profileMode"]:checked')?.value||"muscle";
@@ -279,8 +284,9 @@ function muscleFlags(labels=[]){
   return {upperChest:/上胸/.test(text),chest:/胸大肌/.test(text),sideDelt:/中束|肩宽/.test(text),rearDelt:/后束/.test(text),lats:/背阔|大圆/.test(text),midBack:/斜方|菱形|肩胛|胸椎/.test(text),arms:/二头|三头/.test(text),core:/核心|腹部/.test(text),quads:/股四|腿前/.test(text),glutes:/臀|髋/.test(text),hamstrings:/腘绳|后链/.test(text)};
 }
 function bodyMapSvg(labels=[],variant="day"){
-  const f=muscleFlags(labels), cls=key=>`muscle-zone ${f[key]?"active":""}`, lower=f.quads||f.glutes||f.hamstrings;
-  return `<div class="body-map ${lower?"lower-map":"upper-map"} ${variant}"><svg viewBox="0 0 430 360" role="img" aria-label="目标肌群位置示意"><g class="body-side"><text x="105" y="24">正面</text><circle class="body-base" cx="105" cy="49" r="20"/><path class="body-base" d="M72 76 Q105 64 138 76 L148 176 Q131 198 122 205 L120 310 L92 310 L90 205 Q76 197 62 176Z"/><path class="body-base" d="M72 82 L46 173 60 179 88 104M138 82l26 91-14 6-28-75"/><path class="${cls("upperChest")}" d="M77 82 Q105 72 133 82 L127 101 Q105 94 83 101Z"/><path class="${cls("chest")}" d="M80 103 Q105 94 130 103 L124 132 Q105 145 86 132Z"/><ellipse class="${cls("sideDelt")}" cx="68" cy="89" rx="15" ry="20"/><ellipse class="${cls("sideDelt")}" cx="142" cy="89" rx="15" ry="20"/><path class="${cls("arms")}" d="M56 108l-12 61 15 6 17-58M154 108l12 61-15 6-17-58"/><path class="${cls("core")}" d="M91 138h28l6 47-20 14-20-14Z"/><path class="${cls("quads")}" d="M90 207l-4 96h31l-7-96Z M120 207l5 96h-31l6-96Z"/></g><g class="body-side"><text x="315" y="24">背面</text><circle class="body-base" cx="315" cy="49" r="20"/><path class="body-base" d="M282 76 Q315 64 348 76 L358 176 Q341 198 332 205 L330 310 L302 310 L300 205 Q286 197 272 176Z"/><path class="body-base" d="M282 82l-26 91 14 6 28-75M348 82l26 91-14 6-28-75"/><ellipse class="${cls("rearDelt")}" cx="278" cy="89" rx="15" ry="20"/><ellipse class="${cls("rearDelt")}" cx="352" cy="89" rx="15" ry="20"/><path class="${cls("midBack")}" d="M294 79h42l-8 50-13 14-13-14Z"/><path class="${cls("lats")}" d="M287 103l15 25 13 21 13-21 15-25-8 69-20 23-20-23Z"/><path class="${cls("glutes")}" d="M294 177q21-12 42 0l-4 31q-17 11-17-8-1 19-17 8Z"/><path class="${cls("hamstrings")}" d="M300 209l2 94h27l-8-94Z M330 209l-2 94h-27l8-94Z"/></g></svg><div class="map-legend"><span><i class="pulse-dot"></i>本次重点</span><span>位置示意，不代表疼痛诊断</span></div></div>`;
+  const f=muscleFlags(labels), hot=key=>`anatomy-hotspot ${key} ${f[key]?"active":""}`, lower=f.quads||f.glutes||f.hamstrings;
+  const activeLabels=labels.slice(0,4).map(label=>`<span>${escapeHtml(label)}</span>`).join("");
+  return `<div class="body-map anatomy-map ${lower?"lower-map":"upper-map"} ${variant}"><div class="anatomy-stage" role="img" aria-label="正面与背面肌肉纤维图，红色呼吸光标示本次目标肌群"><img src="./assets/anatomy-muscle-map.png" alt="正面和背面人体肌肉纤维解剖图"><i class="${hot("upperChest")}"></i><i class="${hot("chest")}"></i><i class="${hot("sideDelt")} left"></i><i class="${hot("sideDelt")} right"></i><i class="${hot("arms")} left"></i><i class="${hot("arms")} right"></i><i class="${hot("core")}"></i><i class="${hot("quads")}"></i><i class="${hot("rearDelt")} left"></i><i class="${hot("rearDelt")} right"></i><i class="${hot("midBack")}"></i><i class="${hot("lats")}"></i><i class="${hot("glutes")}"></i><i class="${hot("hamstrings")}"></i><span class="anatomy-label front">FRONT / 正面</span><span class="anatomy-label back">BACK / 背面</span></div><div class="map-targets">${activeLabels||"<span>恢复与位置感</span>"}</div><div class="map-legend"><span><i class="pulse-dot"></i>红色呼吸光＝本次重点</span><span>用于位置识别，不作医学诊断</span></div></div>`;
 }
 
 function renderWeekSwitcher() {
@@ -335,7 +341,7 @@ function renderDayDetail() {
 }
 
 function loadLogForm() { const log=state.logs[logKey(state.week,state.day)]||{}; $("#completedInput").checked=Boolean(log.completed); ["sleep","soreness","finish","body","notes"].forEach(key=>{const el=$(`#${key}Input`);if(el)el.value=log[key]??"";}); $("#saveNote").textContent=""; }
-function saveLog(event) { event.preventDefault(); const sleep=$("#sleepInput").value; state.logs[logKey(state.week,state.day)]={completed:$("#completedInput").checked,sleep:sleep===""?"":Number(sleep),soreness:$("#sorenessInput").value,finish:$("#finishInput").value,body:$("#bodyInput").value,notes:$("#notesInput").value.trim(),updatedAt:new Date().toISOString()}; localStorage.setItem("carbonTrainingLogsV2",JSON.stringify(state.logs)); $("#saveNote").textContent="已保存。周报和下一周判断已同步更新。"; renderHero();renderDayGrid();renderReports(); }
+function saveLog(event) { event.preventDefault(); const sleep=$("#sleepInput").value; state.logs[logKey(state.week,state.day)]={completed:$("#completedInput").checked,sleep:sleep===""?"":Number(sleep),soreness:$("#sorenessInput").value,finish:$("#finishInput").value,body:$("#bodyInput").value,notes:$("#notesInput").value.trim(),updatedAt:new Date().toISOString()}; localStorage.setItem("carbonTrainingLogsV2",JSON.stringify(state.logs)); autoAdjustPriorities(false); $("#saveNote").textContent="已保存。周报、下一周判断和优先肌群已同步更新。"; renderHero();renderDayGrid();renderReports();renderGoals(); }
 function selectWeek(week) { state.week=clamp(week,1,state.weeks.length); localStorage.setItem("carbonSelectedWeekV2",state.week); renderAll(); }
 function selectDay(day) { state.day=clamp(day,1,7); localStorage.setItem("carbonSelectedDayV2",state.day); renderDayGrid();renderDayDetail();loadLogForm(); if(innerWidth<800)$("#dayDetail").scrollIntoView({behavior:"smooth",block:"start"}); }
 
@@ -371,16 +377,32 @@ function radarSvg(current,previous){
   const rings=[25,50,75,100].map(value=>`<polygon points="${radarPoints(Array(5).fill(value))}"/>`).join("");
   return `<div class="radar-wrap"><svg viewBox="0 0 300 290" role="img" aria-label="本周与上周训练状态雷达对比"><g class="radar-grid">${rings}${axes}</g><polygon class="radar-prev" points="${radarPoints(previous.values)}"/><polygon class="radar-now" points="${radarPoints(current.values)}"/>${current.values.map((value,index)=>{const angle=-Math.PI/2+index*Math.PI*2/5,r=100*value/100;return`<circle cx="${150+Math.cos(angle)*r}" cy="${145+Math.sin(angle)*r}" r="4"/>`;}).join("")}</svg><div class="metric-bars">${current.labels.map((label,index)=>`<div><span>${label}</span><i><b style="width:${current.values[index]}%"></b></i><strong>${current.values[index]}</strong></div>`).join("")}</div></div>`;
 }
+const mbtiProfiles={
+  INTJ:{name:"结构设计者",trait:"习惯先看长期结构，再把变量逐一校准"},INTP:{name:"机制拆解者",trait:"喜欢理解动作为什么有效，再建立自己的方法"},
+  ENTJ:{name:"推进统筹者",trait:"擅长给目标排序，并把决定转成执行"},ENTP:{name:"变化试验者",trait:"善于用新刺激保持兴趣，也需要稳定的主线"},
+  INFJ:{name:"内在校准者",trait:"对细微变化敏感，适合把感受沉淀成节律"},INFP:{name:"价值守护者",trait:"愿意为真正认同的状态持续投入"},
+  ENFJ:{name:"场域带动者",trait:"会把自己的进步变成可被他人感受到的能量"},ENFP:{name:"能量连接者",trait:"靠新鲜感点火，再用清晰反馈维持连续"},
+  ISTJ:{name:"稳态保健官",trait:"重视可靠、秩序和长期可维护的身体系统"},ISFJ:{name:"日常照护者",trait:"擅长用稳定的小动作照顾长期状态"},
+  ESTJ:{name:"执行调度者",trait:"会把抽象目标拆成今天必须完成的动作"},ESFJ:{name:"节律维系者",trait:"善于让训练进入可持续的生活节奏"},
+  ISTP:{name:"动作工程师",trait:"对轨迹、效率和身体反馈有天然敏感度"},ISFP:{name:"身体感知者",trait:"通过动作质感建立属于自己的表达"},
+  ESTP:{name:"现场反应者",trait:"在速度、力量和即时反馈中进入状态"},ESFP:{name:"动能表达者",trait:"会把身体变化转化成直观的存在感"}
+};
+function identityGrowth(top){
+  if(/三角|背阔|斜方|菱形|肩袖/.test(top))return"肩背训练正在把你的展开感、边界感和站姿存在感变得更清楚";
+  if(/核心/.test(top))return"核心训练正在把稳定从想法落到身体轴线，让发力更有中心";
+  if(/臀|后链/.test(top))return"后链训练正在补足扎根感，让行动更稳、更有持续力";
+  if(/上胸/.test(top))return"上胸训练正在增强正面表达，让上身轮廓更挺拔但不过度紧张";
+  return"这一周的训练正在把自我理解转成可被看见的身体秩序";
+}
 function weeklyIdentity(metrics,week){
-  const top=state.goalPriorities[0]?.title||"肩背";
-  if(metrics.values[0]>=90)return{code:"VECTOR / 90",name:"稳定推进者",line:`W${week} 把计划变成了可重复的节奏。`,accent:"连续性"};
-  if(/背阔|三角/.test(top))return{code:"ARC / V-02",name:"肩背构型者",line:`W${week} 正在把宽度与背部轮廓连接起来。`,accent:top};
-  if(/臀|核心/.test(top))return{code:"AXIS / Q-01",name:"轴线控制者",line:`W${week} 的重点是让骨盆与核心更稳定。`,accent:top};
-  return{code:"PULSE / R-03",name:"恢复节律者",line:`W${week} 在训练刺激与恢复之间找到平衡。`,accent:top};
+  const top=state.goalPriorities[0]?.title||"肩背", persona=mbtiProfiles[state.mbti], growth=identityGrowth(top);
+  const base=metrics.values[0]>=90?{code:"VECTOR / 90",name:"稳定推进者",line:`W${week} 把计划变成了可重复的节奏。`}:/背阔|三角|斜方|菱形|肩袖/.test(top)?{code:"ARC / V-02",name:"肩背构型者",line:`W${week} 正在把宽度、肩胛控制与背部轮廓连接起来。` }:/臀|核心/.test(top)?{code:"AXIS / Q-01",name:"轴线控制者",line:`W${week} 的重点是让骨盆与核心更稳定。`}:{code:"PULSE / R-03",name:"恢复节律者",line:`W${week} 在训练刺激与恢复之间找到平衡。`};
+  if(!persona)return{...base,accent:top,growth};
+  return{code:`${state.mbti} / ${base.code.split(" / ")[0]}`,name:`${persona.name} · ${base.name}`,line:`${persona.trait}；${growth}。`,accent:top,growth};
 }
 function renderShareIdentity(week,metrics){
   const card=weeklyIdentity(metrics,week), profileTitle=state.profile?findPreset(state.profile.mode,state.profile.preset).title:"长期训练";
-  $("#shareCard").innerHTML=`<div class="identity-card"><div class="identity-no">W${String(week).padStart(2,"0")}</div><div><span>${card.code}</span><h2>${card.name}</h2><p>${card.line}</p></div><div class="identity-foot"><span>${profileTitle}</span><strong>${metrics.values[0]}% 完成 · ${metrics.values[2]} 恢复</strong></div><div class="identity-orbit"><i></i><i></i><i></i></div></div>`;
+  $("#shareCard").innerHTML=`<div class="identity-card"><div class="identity-no">W${String(week).padStart(2,"0")}</div><div><span>${card.code}</span><h2>${card.name}</h2><p>${card.line}</p>${state.mbti?`<small class="identity-growth">训练重点 · ${card.accent}</small>`:""}</div><div class="identity-foot"><span>${profileTitle}</span><strong>${metrics.values[0]}% 完成 · ${metrics.values[2]} 恢复</strong></div><div class="identity-orbit"><i></i><i></i><i></i></div></div>`;
   return card;
 }
 function renderReports(){
@@ -390,16 +412,43 @@ function renderReports(){
   const previous=reportMetrics(Math.max(1,week-1));
   const weekPlan=state.weeks[week-1], activeMuscles=weekPlan.days.flatMap((day,index)=>state.logs[logKey(week,index+1)]?.completed?day.muscles:[]); const labels=activeMuscles.length?activeMuscles:weekPlan.days.filter(d=>d.type==="train").slice(0,2).flatMap(d=>d.muscles);
   $("#reportBodyMap").innerHTML=bodyMapSvg(labels,"report"); $("#bodySignalTag").textContent=metrics.sample?"示例预览 · 记录后替换":"来自本周记录";
-  $("#reportRadar").innerHTML=radarSvg(metrics,previous); renderShareIdentity(week,metrics); $("#shareWeekCard").dataset.week=week;
+  $("#reportRadar").innerHTML=radarSvg(metrics,previous); $("#mbtiInput").value=state.mbti; renderShareIdentity(week,metrics); $("#shareWeekCard").dataset.week=week;
+}
+function priorityMuscleMatch(goalTitle,muscle=""){
+  if(goalTitle==="三角肌中束")return /三角肌中束/.test(muscle);
+  if(goalTitle==="三角肌后束")return /三角肌后束/.test(muscle);
+  if(/背阔/.test(goalTitle))return /背阔|大圆/.test(muscle);
+  if(/上胸/.test(goalTitle))return /上胸/.test(muscle);
+  if(/中下斜方/.test(goalTitle))return /斜方|菱形|肩胛/.test(muscle);
+  if(/前锯/.test(goalTitle))return /前锯|肩袖/.test(muscle);
+  if(/腹部/.test(goalTitle))return /核心|腹部/.test(muscle);
+  if(/臀腿/.test(goalTitle))return /臀|腘绳|后链/.test(muscle);
+  return muscle.includes(goalTitle);
+}
+function autoAdjustPriorities(showNote=true){
+  const completed=[];
+  state.weeks.forEach((week,weekIndex)=>week.days.forEach((day,dayIndex)=>{const log=state.logs[logKey(weekIndex+1,dayIndex+1)];if(log?.completed)completed.push({week:weekIndex+1,day,log});}));
+  const activeWeeks=[...new Set(completed.map(x=>x.week))].slice(-3), recent=completed.filter(x=>activeWeeks.includes(x.week));
+  if(!recent.length){state.priorityNote="还没有已完成训练记录，当前前三沿用你的目标建档。";localStorage.setItem("carbonPriorityNoteV1",state.priorityNote);if(showNote)renderGoals();return;}
+  const targets={"三角肌中束":12,"三角肌后束":10,"背阔肌 / 大圆肌":12,"上胸锁骨部":9,"中下斜方 / 菱形肌":8,"前锯肌 / 肩袖":6,"腹部抗旋转 / 抗伸展":8,"臀腿后链":10};
+  const baseTitles=state.profile?personalizedPriorityTitles(state.profile,findPreset(state.profile.mode,state.profile.preset)):goals.map(g=>g.title);
+  const ranked=state.goalPriorities.map(item=>{
+    let sets=0,recoveryHits=0;
+    recent.forEach(({day,log})=>{(day.exercises||[]).forEach(exercise=>{if(priorityMuscleMatch(item.title,exercise.muscle))sets+=Number(exercise.sets)||0;});if(log.soreness==="high"&&day.muscles.some(muscle=>priorityMuscleMatch(item.title,muscle)))recoveryHits+=1;});
+    const weeklyTarget=targets[item.title]||8, expected=weeklyTarget*Math.max(1,activeWeeks.length), deficit=Math.max(0,expected-sets), baseIndex=Math.max(0,baseTitles.indexOf(item.title));
+    return{...item,_autoScore:(40-baseIndex*3)+deficit*1.25-recoveryHits*7,_sets:sets};
+  }).sort((a,b)=>b._autoScore-a._autoScore).map(({_autoScore,_sets,...item})=>item);
+  state.goalPriorities=ranked; state.priorityNote=`已读取最近 ${activeWeeks.length} 周的完成记录：训练覆盖不足的部位会上移；高酸痛部位会暂时降级恢复。`;
+  savePriorities();localStorage.setItem("carbonPriorityNoteV1",state.priorityNote);if(showNote)renderGoals();
 }
 function renderGoals(){
-  const grid=$("#goalGrid"); grid.innerHTML=state.goalPriorities.map((g,index)=>`<article class="goal-card priority-card" data-rank="${String(index+1).padStart(2,"0")}" data-goal-index="${index}" draggable="true"><div class="goal-card-top"><span class="drag-handle">↕ 拖动</span><span class="tag">优先 ${String(index+1).padStart(2,"0")}</span></div><h3>${g.title}</h3><p>${g.effect}</p><div class="dose">${g.dose}</div><label class="priority-range"><span>当前投入</span><input type="range" min="1" max="10" value="${g.score??7}" data-priority-score="${index}"><output>${g.score??7}/10</output></label></article>`).join("");
-  $$('[data-priority-score]').forEach(input=>input.oninput=()=>{state.goalPriorities[Number(input.dataset.priorityScore)].score=Number(input.value);input.nextElementSibling.textContent=`${input.value}/10`;savePriorities();});
+  const grid=$("#goalGrid"), card=(g,index)=>`<article class="goal-card priority-card" data-rank="${String(index+1).padStart(2,"0")}" data-goal-index="${index}" draggable="true"><div class="goal-card-top"><span class="drag-handle">↕ 拖动</span><span class="tag">优先 ${String(index+1).padStart(2,"0")}</span></div><h3>${g.title}</h3><p>${g.effect}</p><div class="dose">${g.dose}</div></article>`;
+  grid.innerHTML=`<div class="priority-summary"><span class="pulse-dot"></span><p>${state.priorityNote}</p></div><div class="goal-grid priority-primary">${state.goalPriorities.slice(0,3).map(card).join("")}</div><details class="priority-more"><summary><span>其余 5 个支持位</span><small>需要时展开、拖动或提到前三</small></summary><div class="goal-grid priority-secondary">${state.goalPriorities.slice(3).map((g,index)=>card(g,index+3)).join("")}</div></details>`;
   $$('.priority-card').forEach(card=>{card.ondragstart=()=>{draggedGoal=Number(card.dataset.goalIndex);card.classList.add('dragging');};card.ondragend=()=>{draggedGoal=null;card.classList.remove('dragging');};card.ondragover=e=>{e.preventDefault();card.classList.add('drag-over');};card.ondragleave=()=>card.classList.remove('drag-over');card.ondrop=e=>{e.preventDefault();card.classList.remove('drag-over');const to=Number(card.dataset.goalIndex);if(draggedGoal===null||draggedGoal===to)return;const [item]=state.goalPriorities.splice(draggedGoal,1);state.goalPriorities.splice(to,0,item);savePriorities();renderGoals();};});
 }
 
 async function shareWeekCard(){
-  const week=Number($("#shareWeekCard").dataset.week||state.week),metrics=reportMetrics(week),identity=weeklyIdentity(metrics,week),canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;const c=canvas.getContext("2d");c.fillStyle="#070707";c.fillRect(0,0,1080,1350);c.fillStyle="#ff4a3d";c.fillRect(72,72,936,12);c.strokeStyle="#292522";c.lineWidth=2;c.strokeRect(72,72,936,1206);c.fillStyle="#9d9690";c.font="700 34px system-ui";c.fillText(`CARBON / WEEK ${String(week).padStart(2,"0")}`,112,150);c.fillStyle="#f2efeb";c.font="900 92px system-ui";c.fillText(identity.name,112,300);c.fillStyle="#ff4a3d";c.font="800 40px system-ui";c.fillText(identity.code,112,370);c.fillStyle="#bdb6af";c.font="36px system-ui";wrapCanvasText(c,identity.line,112,460,820,54);const labels=["完成","睡眠","恢复","动作","连续"];metrics.values.forEach((value,index)=>{const y=650+index*92;c.fillStyle="#928b85";c.font="28px system-ui";c.fillText(labels[index],112,y);c.fillStyle="#211f1d";c.fillRect(260,y-24,620,28);c.fillStyle="#ff4a3d";c.fillRect(260,y-24,620*value/100,28);c.fillStyle="#f2efeb";c.font="800 30px system-ui";c.fillText(String(value),910,y);});c.fillStyle="#716b65";c.font="26px system-ui";c.fillText("目标不是一张照片，是下一周仍然能继续的系统。",112,1190);c.fillStyle="#f2efeb";c.font="800 28px system-ui";c.fillText("CARBON TRAINING CONSOLE",112,1240);
+  const week=Number($("#shareWeekCard").dataset.week||state.week),metrics=reportMetrics(week),identity=weeklyIdentity(metrics,week),canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;const c=canvas.getContext("2d");c.fillStyle="#070707";c.fillRect(0,0,1080,1350);c.fillStyle="#ff4a3d";c.fillRect(72,72,936,12);c.strokeStyle="#292522";c.lineWidth=2;c.strokeRect(72,72,936,1206);c.fillStyle="#9d9690";c.font="700 34px system-ui";c.fillText(`CARBON / WEEK ${String(week).padStart(2,"0")}`,112,150);c.fillStyle="#f2efeb";c.font=state.mbti?"900 64px system-ui":"900 92px system-ui";c.fillText(identity.name,112,300);c.fillStyle="#ff4a3d";c.font="800 40px system-ui";c.fillText(identity.code,112,370);c.fillStyle="#bdb6af";c.font="36px system-ui";wrapCanvasText(c,identity.line,112,460,820,54);const labels=["完成","睡眠","恢复","动作","连续"];metrics.values.forEach((value,index)=>{const y=650+index*92;c.fillStyle="#928b85";c.font="28px system-ui";c.fillText(labels[index],112,y);c.fillStyle="#211f1d";c.fillRect(260,y-24,620,28);c.fillStyle="#ff4a3d";c.fillRect(260,y-24,620*value/100,28);c.fillStyle="#f2efeb";c.font="800 30px system-ui";c.fillText(String(value),910,y);});c.fillStyle="#716b65";c.font="26px system-ui";c.fillText("目标不是一张照片，是下一周仍然能继续的系统。",112,1190);c.fillStyle="#f2efeb";c.font="800 28px system-ui";c.fillText("CARBON TRAINING CONSOLE",112,1240);
   const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png")); if(!blob)return; const file=new File([blob],`carbon-week-${week}.png`,{type:"image/png"});
   try{if(navigator.share&&navigator.canShare?.({files:[file]})){await navigator.share({title:`${identity.name} · W${week}`,text:identity.line,files:[file]});return;}}catch(error){if(error.name==="AbortError")return;}
   const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=file.name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -444,9 +493,9 @@ function registerWebMCP(){
   const tools=[
     {name:'read_week_plan',title:'读取长期周训练计划',description:'读取任意已生成周的7天主题、核心肌群和训练动作。',inputSchema:{type:'object',properties:{week:{type:'integer',minimum:1}},required:['week'],additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:false},execute(input){const week=safeWeek(input),plan=state.weeks[week-1];return{week,focus:plan.name,load:plan.load,reason:plan.reason,days:plan.days.map((d,i)=>({day:i+1,type:d.type,theme:d.short,muscles:d.muscles,exercises:(d.exercises||[]).map(e=>({muscle:e.muscle,name:e.name,prescription:`${e.sets}组，每组${e.reps}，休息${e.rest}秒`,cue:e.cue}))}))};}},
     {name:'add_next_week',title:'生成下一周',description:'根据最近一周反馈生成可编辑的新一周，并自动变换训练日顺序。',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(){addNextWeek();const week=state.weeks.length;return{created:true,week,focus:state.weeks[week-1].name,load:state.weeks[week-1].load};}},
-    {name:'record_workout_feedback',title:'记录训练反馈',description:'用完成情况、睡眠、低中高酸痛、完成状态和身体感受记录训练。',inputSchema:{type:'object',properties:{week:{type:'integer',minimum:1},day:{type:'integer',minimum:1,maximum:7},completed:{type:'boolean'},sleep:{type:'number',minimum:0,maximum:12},soreness:{type:'string',enum:['low','medium','high']},finish:{type:'string',enum:['easy','just','form_break']},body:{type:'string',enum:['smooth','tight_ok','limited']},notes:{type:'string',maxLength:500}},required:['week','day','completed'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){const week=safeWeek(input),day=Number(input.day);if(!Number.isInteger(day)||day<1||day>7)throw new Error('day 必须是 1 到 7 的整数');state.logs[logKey(week,day)]={...input,updatedAt:new Date().toISOString()};localStorage.setItem('carbonTrainingLogsV2',JSON.stringify(state.logs));renderAll();return{saved:true,week,day,recommendation:reportCopy(getReport(week).mode)};}},
+    {name:'record_workout_feedback',title:'记录训练反馈',description:'用完成情况、睡眠、低中高酸痛、完成状态和身体感受记录训练。',inputSchema:{type:'object',properties:{week:{type:'integer',minimum:1},day:{type:'integer',minimum:1,maximum:7},completed:{type:'boolean'},sleep:{type:'number',minimum:0,maximum:12},soreness:{type:'string',enum:['low','medium','high']},finish:{type:'string',enum:['easy','just','form_break']},body:{type:'string',enum:['smooth','tight_ok','limited']},notes:{type:'string',maxLength:500}},required:['week','day','completed'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){const week=safeWeek(input),day=Number(input.day);if(!Number.isInteger(day)||day<1||day>7)throw new Error('day 必须是 1 到 7 的整数');state.logs[logKey(week,day)]={...input,updatedAt:new Date().toISOString()};localStorage.setItem('carbonTrainingLogsV2',JSON.stringify(state.logs));autoAdjustPriorities(false);renderAll();return{saved:true,week,day,recommendation:reportCopy(getReport(week).mode),topPriorities:state.goalPriorities.slice(0,3).map(x=>x.title)};}},
     {name:'read_week_report',title:'读取周报',description:'读取指定周的完成率、睡眠与人话版恢复反馈。',inputSchema:{type:'object',properties:{week:{type:'integer',minimum:1}},required:['week'],additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:false},execute(input){const week=safeWeek(input),r=getReport(week);return{week,completionPercent:Math.round(r.completion*100),averageSleep:r.sleep,soreness:r.soreness,finish:r.finish,body:r.body,recommendation:reportCopy(r.mode)};}},
-    {name:'update_training_profile',title:'更新训练目标建档',description:'按增肌塑形或体态调整目标更新方向与备注，并从当前周重算四周计划。',inputSchema:{type:'object',properties:{mode:{type:'string',enum:['muscle','posture']},preset:{type:'string',enum:['combat','upper','balanced','shoulder','hip','whole']},weight:{type:'number',minimum:35,maximum:200},bodyFat:{type:'number',minimum:3,maximum:50},trainingAge:{type:'string',enum:['starter','regular','experienced']},notes:{type:'string',maxLength:500}},required:['mode','preset'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){const allowed=(profilePresets[input.mode]||[]).some(item=>item.id===input.preset);if(!allowed)throw new Error('preset 与 mode 不匹配');const profile={...(state.profile||{}),...input,images:state.profile?.images||{},updatedAt:new Date().toISOString()};state.profile=profile;localStorage.setItem('carbonProfileV1',JSON.stringify(profile));applyProfileToPlan(profile);renderAll();return{saved:true,focus:findPreset(profile.mode,profile.preset).title,priorities:state.goalPriorities.slice(0,4).map(x=>x.title),weeks:[state.week,state.week+1,state.week+2,state.week+3]};}}
+    {name:'update_training_profile',title:'更新训练目标建档',description:'按增肌塑形或体态调整目标更新方向与备注，并从当前周重算四周计划。',inputSchema:{type:'object',properties:{mode:{type:'string',enum:['muscle','posture']},preset:{type:'string',enum:['combat','upper','balanced','shoulder','hip','whole','headneck','asymmetry','breath']},weight:{type:'number',minimum:35,maximum:200},bodyFat:{type:'number',minimum:3,maximum:50},trainingAge:{type:'string',enum:['starter','regular','experienced']},mbti:{type:'string',enum:['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP']},notes:{type:'string',maxLength:500}},required:['mode','preset'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){const allowed=(profilePresets[input.mode]||[]).some(item=>item.id===input.preset);if(!allowed)throw new Error('preset 与 mode 不匹配');if(input.mbti){state.mbti=input.mbti;localStorage.setItem('carbonMbtiV1',state.mbti);}const {mbti,...profileInput}=input,profile={...(state.profile||{}),...profileInput,images:state.profile?.images||{},updatedAt:new Date().toISOString()};state.profile=profile;localStorage.setItem('carbonProfileV1',JSON.stringify(profile));applyProfileToPlan(profile);renderAll();return{saved:true,focus:findPreset(profile.mode,profile.preset).title,priorities:state.goalPriorities.slice(0,3).map(x=>x.title),weeks:[state.week,state.week+1,state.week+2,state.week+3],mbti:state.mbti||null};}}
   ];
   tools.forEach(tool=>{try{void Promise.resolve(context.registerTool(tool)).catch(()=>{});}catch(_){}});
 }
@@ -457,7 +506,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   $("#profileForm").addEventListener('submit',saveProfile);
   $$('input[name="profileMode"]').forEach(input=>input.onchange=e=>{$("#goalPresets").innerHTML=presetCards(e.target.value,profilePresets[e.target.value][0].id);});
   [["goal","#goalImageInput"],["front","#frontImageInput"],["back","#backImageInput"]].forEach(([kind,id])=>$(id).onchange=e=>handleProfileImage(kind,e.target.files?.[0]));
-  $("#openProfileFromTargets").onclick=()=>switchView('profile'); $("#shareWeekCard").onclick=shareWeekCard;
+  $("#openProfileFromTargets").onclick=()=>switchView('profile'); $("#autoPrioritySort").onclick=()=>autoAdjustPriorities(true); $("#shareWeekCard").onclick=shareWeekCard;
+  $("#mbtiInput").onchange=e=>{state.mbti=e.target.value;localStorage.setItem("carbonMbtiV1",state.mbti);renderReports();};
   $$('.nav-btn').forEach(btn=>btn.onclick=()=>switchView(btn.dataset.view));
   ["#addWeek","#addWeekHero","#addWeekPlan"].forEach(id=>$(id).onclick=addNextWeek); ["#editWeekHero","#editWeekPlan"].forEach(id=>$(id).onclick=openWeekDialog);
   $("#saveWeekEdit").onclick=saveWeekEdit; $("#saveDayEdit").onclick=saveDayEdit;
