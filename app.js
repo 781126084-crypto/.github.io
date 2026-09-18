@@ -15,6 +15,51 @@ const exerciseBank = {
   "肱二头肌": ["锤式弯举", "杠铃弯举", "上斜哑铃弯举"],
   "肱三头肌": ["过顶绳索臂屈伸", "绳索下压", "窄距俯卧撑"]
 };
+const homeExerciseBank = {
+  "背阔肌 / 大圆肌": [
+    {name:"跪姿毛巾前伸后拉",sets:4,reps:"10–15 次",rest:60,cue:"双手压紧毛巾，手臂伸向斜前方，再用腋窝发力把手肘拉向身体两侧。",why:"用持续对抗模拟下拉轨迹，重点找腋后侧收紧。"},
+    {name:"俯卧直臂下拉",sets:3,reps:"12–18 次",rest:45,cue:"俯卧抬起双臂，手臂近乎伸直地从头顶扫向髋部，肩膀远离耳朵。",why:"不用器械也能练习背阔肌把手臂拉向身体的功能。"}
+  ],
+  "中下斜方肌 / 菱形肌": [
+    {name:"俯卧 Y-T-W",sets:3,reps:"每个字母 6–8 次",rest:60,cue:"胸口轻贴地面，依次把手臂摆成 Y、T、W；只抬到肩胛能控制的位置。",why:"强化肩胛后缩、下压与上旋控制。"},
+    {name:"俯卧宽肘划船停顿",sets:3,reps:"10–15 次",rest:60,cue:"俯卧，双肘向外拉到与肩平齐，顶端夹肩胛停 2 秒再慢慢放下。",why:"用等长停顿补足中背收缩感。"}
+  ],
+  "三角肌中束": [
+    {name:"矿泉水瓶侧平举",sets:3,reps:"15–25 次",rest:45,cue:"手肘带动向两侧抬，肩膀远离耳朵；重量不足就放慢下落。",why:"直接刺激肩中束，维持肩宽训练。"}
+  ],
+  "三角肌后束": [
+    {name:"俯身水瓶反向飞鸟",sets:3,reps:"15–25 次",rest:45,cue:"髋向后、背部稳定，手臂向斜后方打开，不耸肩也不甩。",why:"在家补足后肩轮廓和肩胛控制。"}
+  ],
+  "上胸锁骨部": [
+    {name:"脚抬高俯卧撑",sets:4,reps:"6–15 次",rest:75,cue:"双脚放稳在矮凳，身体保持一条直线，胸口下放到双手之间。",why:"通过身体角度把更多负荷放在上胸。"},
+    {name:"背包上斜地板推",sets:3,reps:"10–15 次",rest:60,cue:"上背垫高约 20°，双手稳握背包推起，肋骨不要外翻。",why:"用可加重背包替代上斜器械推举。"}
+  ],
+  "胸大肌中部": [
+    {name:"慢速标准俯卧撑",sets:4,reps:"8–20 次",rest:75,cue:"下放 3 秒，胸口接近地面后稳定推起；做不到就跪姿。",why:"用慢离心提高胸部有效刺激。"}
+  ],
+  "股四头肌": [
+    {name:"背包高脚杯深蹲",sets:4,reps:"10–20 次",rest:75,cue:"背包抱在胸前，下蹲 3 秒，膝盖跟脚尖方向一致。",why:"用背包负重和慢节奏替代器械深蹲。"},
+    {name:"前脚垫高分腿蹲",sets:3,reps:"8–15 次 / 侧",rest:75,cue:"前脚踩稳，身体直上直下，前膝顺着脚尖向前。",why:"单腿动作让较轻负重也足够刺激腿前侧。"}
+  ],
+  "臀大肌 / 臀中肌": [
+    {name:"单腿臀桥停顿",sets:4,reps:"10–15 次 / 侧",rest:60,cue:"先轻收骨盆再抬髋，顶部夹臀 2 秒，不用腰顶高。",why:"在家强化臀大肌缩短位和左右控制。"},
+    {name:"侧卧髋外展",sets:3,reps:"15–25 次 / 侧",rest:45,cue:"脚尖微微朝下，腿向后上方抬，骨盆不要向后翻。",why:"直接补臀中肌和骨盆稳定。"}
+  ],
+  "腘绳肌": [
+    {name:"毛巾滑腿弯举",sets:4,reps:"8–15 次",rest:75,cue:"脚跟踩毛巾，抬髋后慢慢滑远再拉回；腰不要塌。",why:"在光滑地面模拟腿弯举，训练腘绳肌屈膝功能。"},
+    {name:"背包罗马尼亚硬拉",sets:4,reps:"10–18 次",rest:75,cue:"背包贴近腿，髋向后推，到腿后侧有拉伸就站起。",why:"用背包训练髋铰链和后链力量。"}
+  ],
+  "核心抗旋转 / 抗伸展": [
+    {name:"Dead bug",sets:3,reps:"8–12 次 / 侧",rest:45,cue:"腰背轻贴地面，对侧手脚慢慢伸远；腰一离地就缩小幅度。",why:"不靠器械建立腹部抗伸展能力。"},
+    {name:"平板支撑交替点肩",sets:3,reps:"8–12 次 / 侧",rest:45,cue:"双脚稍分开，点肩时骨盆尽量不左右转动。",why:"用自身体重训练核心抗旋转。"}
+  ],
+  "肱二头肌": [
+    {name:"背包弯举",sets:3,reps:"10–20 次",rest:60,cue:"上臂贴近身体，慢慢弯起和放下；用书本调整背包重量。",why:"在家延续二头肌直接训练。"}
+  ],
+  "肱三头肌": [
+    {name:"窄距俯卧撑",sets:3,reps:"6–15 次",rest:60,cue:"双手略窄于肩，手肘向后收；做不到就跪姿完成。",why:"用推撑动作强化手臂后侧。"}
+  ]
+};
 const muscleOptions = Object.keys(exerciseBank);
 
 const shoulderMobility = {
@@ -156,6 +201,7 @@ const state = {
   goalPriorities: safeParse("carbonGoalPrioritiesV1", null) || goals.map((g,index)=>({...g,score:10-index})),
   mbti: localStorage.getItem("carbonMbtiV1") || "",
   identityGender: localStorage.getItem("carbonIdentityGenderV1") || "male",
+  trainingVenue: localStorage.getItem("carbonTrainingVenueV1") === "home" ? "home" : "gym",
   priorityNote: localStorage.getItem("carbonPriorityNoteV1") || "当前顺序来自目标建档；开始记录后会按训练覆盖量自动校准。"
 };
 if (!storedLogsV2 && Object.keys(migratedLegacyLogs).length) localStorage.setItem("carbonTrainingLogsV2",JSON.stringify(migratedLegacyLogs));
@@ -330,15 +376,29 @@ function wireDayCards(scope) {
 function renderDayGrid() { const grid=$("#dayGrid"); grid.innerHTML=currentWeek().days.map((d,i)=>dayCardMarkup(d,i+1)).join(""); wireDayCards(grid); }
 function renderChecklist(items) { return `<div class="check-list">${items.map((item,i)=>`<div class="check-item"><span class="check-num">${i+1}</span><div><strong>${item[0]||item}</strong>${item[1]?`<p>${item[1]}</p>`:""}</div></div>`).join("")}</div>`; }
 function renderMobility(mobility) { return `<section class="detail-section mobility-block"><div class="section-kicker">独立辅助 · ${mobility.duration||"20–30 分钟"}</div><h3>${mobility.label}</h3><p class="section-reason">${mobility.reason}</p><div class="mobility-grid">${mobility.items.slice(0,3).map((item,i)=>`<article><span>0${i+1}</span><h4>${item.name}</h4><p>${item.instruction}</p><strong>${item.dose}</strong></article>`).join("")}</div></section>`; }
+function venueExercises(day) {
+  if (state.trainingVenue !== "home") return day.exercises.slice(0,5);
+  const used = {};
+  return day.exercises.slice(0,5).map(item => {
+    const options = homeExerciseBank[item.muscle];
+    if (!options?.length) return item;
+    const index = used[item.muscle] || 0;
+    used[item.muscle] = index + 1;
+    return {...item,...options[index % options.length]};
+  });
+}
 function renderDayDetail() {
   const day=currentDay();
+  const displayExercises=day.type==="train" ? venueExercises(day) : [];
+  const venueNote=state.trainingVenue==="home" ? "居家版：使用自重、背包、水瓶或毛巾完成；仍然练同一批核心肌群。" : "健身房版：优先使用器械和自由重量，方便稳定加重量与记录进步。";
   const train = day.type==="train" ? `
     <section class="detail-section"><div class="section-kicker">01 · 训练前热身</div><h3>先把今天要用的部位叫醒</h3><p class="section-reason">${day.warmup.summary}</p>${renderChecklist(day.warmup.items)}</section>
-    <section class="detail-section main-training"><div class="section-kicker">02 · 主训练</div><h3>先看肌群，再看动作</h3><div class="exercise-stack">${day.exercises.slice(0,5).map((item,index)=>`<article class="exercise-row"><div class="exercise-index">0${index+1}</div><div class="exercise-muscle"><span>核心肌群</span><strong>${item.muscle}</strong></div><div class="exercise-action"><h4>${item.name}</h4><p>${item.why}</p></div><div class="plain-prescription"><strong>${item.sets} 组 · 每组 ${item.reps}</strong><span>组间休息 ${item.rest} 秒</span><p>${item.cue}</p></div></article>`).join("")}</div></section>
+    <section class="detail-section main-training"><div class="training-section-head"><div><div class="section-kicker">02 · 主训练</div><h3>先看肌群，再看动作</h3></div><div class="venue-switch" role="group" aria-label="选择训练场地"><button class="venue-btn ${state.trainingVenue==="gym"?"active":""}" type="button" data-venue="gym">健身房版</button><button class="venue-btn ${state.trainingVenue==="home"?"active":""}" type="button" data-venue="home">居家版</button></div></div><p class="venue-note">${venueNote}</p><div class="exercise-stack">${displayExercises.map((item,index)=>`<article class="exercise-row"><div class="exercise-index">0${index+1}</div><div class="exercise-muscle"><span>核心肌群</span><strong>${item.muscle}</strong></div><div class="exercise-action"><h4>${item.name}</h4><p>${item.why}</p></div><div class="plain-prescription"><strong>${item.sets} 组 · 每组 ${item.reps}</strong><span>组间休息 ${item.rest} 秒</span><p>${item.cue}</p></div></article>`).join("")}</div></section>
     <section class="detail-section"><div class="section-kicker">03 · 训练后调整</div><h3>让用过的部位恢复长度和呼吸</h3><p class="section-reason">${day.cooldown.summary}</p>${renderChecklist(day.cooldown.items)}</section>` : `
     <section class="detail-section"><div class="section-kicker">今日恢复任务</div><h3>休息日不是补课日</h3>${renderChecklist(day.recovery||[])}</section>`;
   $("#dayDetail").innerHTML=`<div class="detail-head"><div><div class="eyebrow">DAY ${String(state.day).padStart(2,"0")} · ${day.type==="train"?"TRAIN":"RECOVER"}</div><h2>${day.short}</h2><p>${day.why}</p><div class="muscle-row">${day.muscles.map(m=>`<span class="muscle-chip">${m}</span>`).join("")}</div></div><div class="detail-actions"><span class="status-chip ${day.type==="train"?"red":"green"}">${day.focus}</span><button class="ghost-btn" id="editCurrentDay" type="button">编辑当天</button></div></div><section class="muscle-focus-panel"><div><div class="section-kicker">TARGET MAP · 发力位置</div><h3>${day.type==="train"?"亮起的区域，是今天应该优先感受到的位置":"今天只让这些区域恢复顺畅"}</h3><p>${day.type==="train"?"先在图上建立位置感，再用轻重量热身确认；关节疼痛不等于目标肌群发力。":"红色区域只作活动方向提示，不追求疲劳或极限幅度。"}</p></div>${bodyMapSvg(day.muscles)}</section>${train}${renderMobility(day.mobility)}`;
   $("#editCurrentDay").onclick=()=>openDayDialog(state.day);
+  $$('[data-venue]').forEach(button=>button.onclick=()=>{state.trainingVenue=button.dataset.venue;localStorage.setItem("carbonTrainingVenueV1",state.trainingVenue);renderDayDetail();});
 }
 
 function loadLogForm() { const log=state.logs[logKey(state.week,state.day)]||{}; $("#completedInput").checked=Boolean(log.completed); ["sleep","soreness","finish","body","notes"].forEach(key=>{const el=$(`#${key}Input`);if(el)el.value=log[key]??"";}); $("#saveNote").textContent=""; }
