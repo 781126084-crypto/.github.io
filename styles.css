@@ -365,6 +365,12 @@ button { color: inherit; }
 .section-kicker { color: var(--red); font-size: .74rem; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
 .detail-section > h3 { margin: 5px 0 5px; font-size: 1.3rem; }
 .section-reason { max-width: 850px; margin: 0 0 17px; color: var(--muted); }
+.training-section-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; }
+.training-section-head h3 { margin:5px 0 0; font-size:1.3rem; }
+.venue-switch { display:inline-grid; grid-template-columns:1fr 1fr; gap:4px; padding:4px; border:1px solid var(--line); border-radius:12px; background:#080808; }
+.venue-btn { min-height:38px; padding:7px 13px; border:0; border-radius:8px; background:transparent; color:var(--muted); cursor:pointer; font-weight:850; white-space:nowrap; }
+.venue-btn.active { background:var(--red); color:#090909; box-shadow:0 6px 20px rgba(255,74,61,.2); }
+.venue-note { margin:10px 0 0; color:#b8b1aa; font-size:.84rem; }
 .exercise-stack { display: grid; gap: 8px; margin-top: 16px; }
 .exercise-row { display: grid; grid-template-columns: 38px minmax(150px,.65fr) minmax(210px,1fr) minmax(210px,.85fr); gap: 14px; align-items: start; padding: 16px; border: 1px solid var(--line); border-radius: 13px; background: #0c0c0c; }
 .exercise-index { color: var(--red); font-weight: 950; }
@@ -535,23 +541,23 @@ button { color: inherit; }
 .anatomy-label { position:absolute; z-index:4; top:13px; padding:5px 8px; border-radius:7px; background:rgba(0,0,0,.7); color:#9a938d; font-size:.64rem; font-weight:900; letter-spacing:.12em; }
 .anatomy-label.front { left:12px; }
 .anatomy-label.back { right:12px; }
-.anatomy-hotspot { position:absolute; z-index:3; display:none; pointer-events:none; border:0; background:rgba(255,48,34,.7); box-shadow:none; mix-blend-mode:screen; filter:blur(1.4px) saturate(1.45) brightness(1.15); opacity:.72; }
+.anatomy-hotspot { position:absolute; z-index:3; display:none; pointer-events:none; border:0; background:radial-gradient(ellipse at 50% 48%,rgba(255,102,88,.94) 0%,rgba(255,54,39,.82) 55%,rgba(255,48,34,.3) 78%,transparent 100%); box-shadow:none; mix-blend-mode:screen; filter:saturate(1.45) brightness(1.18); opacity:.66; }
 .anatomy-hotspot.active { display:block; animation:anatomyPulse 1.7s ease-in-out infinite; }
 .anatomy-hotspot.upperChest { left:14.5%; top:16.5%; width:27%; height:8%; clip-path:polygon(5% 18%,50% 0,95% 18%,88% 82%,50% 62%,12% 82%); }
 .anatomy-hotspot.chest { left:12%; top:20%; width:32%; height:12%; clip-path:polygon(5% 0,48% 5%,50% 90%,4% 74%,0 30%,95% 0,100% 30%,96% 74%,52% 90%,52% 5%); }
-.anatomy-hotspot.sideDelt.left { left:7%; top:17%; width:8%; height:12%; clip-path:polygon(52% 0,92% 18%,100% 58%,64% 100%,18% 77%,0 34%); transform:rotate(14deg); }
-.anatomy-hotspot.sideDelt.right { left:42%; top:17%; width:8%; height:12%; clip-path:polygon(48% 0,8% 18%,0 58%,36% 100%,82% 77%,100% 34%); transform:rotate(-14deg); }
+.anatomy-hotspot.sideDelt.left { left:7.2%; top:17.3%; width:8.6%; height:11.4%; border-radius:49% 48% 54% 45%; transform:rotate(14deg); }
+.anatomy-hotspot.sideDelt.right { left:41.5%; top:17.3%; width:8.6%; height:11.4%; border-radius:48% 49% 45% 54%; transform:rotate(-14deg); }
 .anatomy-hotspot.arms.left { left:1.5%; top:24%; width:11%; height:27%; clip-path:polygon(40% 0,76% 3%,94% 38%,70% 100%,32% 94%,5% 42%); transform:rotate(8deg); }
 .anatomy-hotspot.arms.right { left:45%; top:24%; width:11%; height:27%; clip-path:polygon(60% 0,24% 3%,6% 38%,30% 100%,68% 94%,95% 42%); transform:rotate(-8deg); }
 .anatomy-hotspot.core { left:17%; top:28%; width:23%; height:20%; clip-path:polygon(12% 0,88% 0,78% 100%,22% 100%); }
 .anatomy-hotspot.quads { left:11%; top:47%; width:35%; height:22%; clip-path:polygon(8% 0,45% 2%,49% 100%,2% 90%,55% 2%,92% 0,98% 90%,51% 100%); }
-.anatomy-hotspot.rearDelt.left { left:55%; top:17%; width:9%; height:12%; clip-path:polygon(55% 0,94% 18%,100% 58%,63% 100%,16% 75%,0 34%); transform:rotate(-14deg); }
-.anatomy-hotspot.rearDelt.right { left:91%; top:17%; width:8%; height:12%; clip-path:polygon(45% 0,6% 18%,0 58%,37% 100%,84% 75%,100% 34%); transform:rotate(14deg); }
+.anatomy-hotspot.rearDelt.left { left:55.2%; top:17.2%; width:9%; height:11.4%; border-radius:48% 52% 48% 55%; transform:rotate(-13deg); }
+.anatomy-hotspot.rearDelt.right { left:85.8%; top:17.2%; width:9%; height:11.4%; border-radius:52% 48% 55% 48%; transform:rotate(13deg); }
 .anatomy-hotspot.midBack { left:63%; top:13%; width:29%; height:22%; clip-path:polygon(8% 0,92% 0,72% 100%,50% 78%,28% 100%); }
 .anatomy-hotspot.lats { left:59%; top:23%; width:36%; height:22%; clip-path:polygon(0 0,100% 0,76% 100%,50% 78%,24% 100%); }
 .anatomy-hotspot.glutes { left:65%; top:40%; width:28%; height:14%; clip-path:polygon(3% 8%,48% 0,50% 100%,0 82%,52% 0,97% 8%,100% 82%,50% 100%); }
 .anatomy-hotspot.hamstrings { left:65%; top:51%; width:28%; height:20%; clip-path:polygon(0 0,46% 0,48% 100%,5% 92%,54% 0,100% 0,95% 92%,52% 100%); }
-@keyframes anatomyPulse { 0%,100% { opacity:.42; filter:blur(1.8px) saturate(1.25) brightness(1); } 50% { opacity:.92; filter:blur(.35px) saturate(1.8) brightness(1.75); } }
+@keyframes anatomyPulse { 0%,100% { opacity:.46; filter:saturate(1.3) brightness(1.02); } 50% { opacity:.9; filter:saturate(1.75) brightness(1.62); } }
 .map-targets { display:flex; flex-wrap:wrap; gap:5px; margin:9px 0 7px; }
 .map-targets span { padding:4px 7px; border:1px solid rgba(255,74,61,.28); border-radius:999px; background:rgba(255,74,61,.08); color:#ffaaa3; font-size:.67rem; }
 .map-legend { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:.75rem; }
@@ -642,5 +648,7 @@ button { color: inherit; }
   .target-actions { width:100%; justify-content:flex-start; }
   .anatomy-stage { border-radius:14px; }
   .map-legend { align-items:flex-start; flex-direction:column; }
+  .training-section-head { align-items:stretch; flex-direction:column; }
+  .venue-switch { width:100%; }
   .identity-card h2 { max-width:90%; font-size:1.65rem; }
 }
