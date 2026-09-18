@@ -155,6 +155,7 @@ const state = {
   profile: safeParse("carbonProfileV1", null),
   goalPriorities: safeParse("carbonGoalPrioritiesV1", null) || goals.map((g,index)=>({...g,score:10-index})),
   mbti: localStorage.getItem("carbonMbtiV1") || "",
+  identityGender: localStorage.getItem("carbonIdentityGenderV1") || "male",
   priorityNote: localStorage.getItem("carbonPriorityNoteV1") || "当前顺序来自目标建档；开始记录后会按训练覆盖量自动校准。"
 };
 if (!storedLogsV2 && Object.keys(migratedLegacyLogs).length) localStorage.setItem("carbonTrainingLogsV2",JSON.stringify(migratedLegacyLogs));
@@ -388,21 +389,36 @@ const mbtiProfiles={
   ESTP:{name:"现场反应者",trait:"在速度、力量和即时反馈中进入状态"},ESFP:{name:"动能表达者",trait:"会把身体变化转化成直观的存在感"}
 };
 function identityGrowth(top){
-  if(/三角|背阔|斜方|菱形|肩袖/.test(top))return"肩背训练正在把你的展开感、边界感和站姿存在感变得更清楚";
-  if(/核心/.test(top))return"核心训练正在把稳定从想法落到身体轴线，让发力更有中心";
-  if(/臀|后链/.test(top))return"后链训练正在补足扎根感，让行动更稳、更有持续力";
-  if(/上胸/.test(top))return"上胸训练正在增强正面表达，让上身轮廓更挺拔但不过度紧张";
-  return"这一周的训练正在把自我理解转成可被看见的身体秩序";
+  if(/三角|背阔|斜方|菱形|肩袖/.test(top))return"它带动的不只是肩宽，而是展开感、边界感与更稳定的站姿存在感";
+  if(/核心/.test(top))return"它正在把稳定从思考方式落到身体轴线，让动作和决策都更有中心";
+  if(/臀|后链/.test(top))return"它正在补足身体的扎根感，让行动更稳，也更能持续输出";
+  if(/上胸/.test(top))return"它正在增强正面表达，让上身轮廓更挺拔，但不会靠紧张和耸肩撑起来";
+  return"它正在把你的自我理解，慢慢变成能被看见的身体秩序";
+}
+function identityBaseline(metrics,persona){
+  if(persona)return`你更像一名${persona.name}：${persona.trait}。`;
+  if(metrics.values[0]>=85&&metrics.values[2]>=70)return"你本身的优势是执行稳定，也愿意为恢复留出空间；不是靠一时兴奋硬顶。";
+  if(metrics.values[0]>=80)return"你本身行动力很强，能把计划推进下去；下一步要让恢复也跟上执行速度。";
+  return"你正在建立自己的训练节律：先把身体反馈看清，再把偶尔完成变成稳定重复。";
+}
+function identityTraining(top,week){
+  if(/三角|背阔|斜方|菱形|肩袖/.test(top))return`W${week} 把 ${top} 放在最前，正在连接肩宽、肩胛控制和背部轮廓，让上半身不是“撑大”，而是有结构。`;
+  if(/核心/.test(top))return`W${week} 以 ${top} 为主线，正在提高肋骨、骨盆和躯干之间的控制，让力量传递更完整。`;
+  if(/臀|后链/.test(top))return`W${week} 重点推进 ${top}，正在让髋部发力、下肢稳定和全身运动感连成一条线。`;
+  if(/上胸/.test(top))return`W${week} 重点补 ${top}，正在填充锁骨下方的轮廓，同时保留肩颈的放松与肩胛节奏。`;
+  return`W${week} 围绕 ${top} 建立可重复刺激，让身体变化来自清楚的主线，而不是随机堆动作。`;
 }
 function weeklyIdentity(metrics,week){
   const top=state.goalPriorities[0]?.title||"肩背", persona=mbtiProfiles[state.mbti], growth=identityGrowth(top);
   const base=metrics.values[0]>=90?{code:"VECTOR / 90",name:"稳定推进者",line:`W${week} 把计划变成了可重复的节奏。`}:/背阔|三角|斜方|菱形|肩袖/.test(top)?{code:"ARC / V-02",name:"肩背构型者",line:`W${week} 正在把宽度、肩胛控制与背部轮廓连接起来。` }:/臀|核心/.test(top)?{code:"AXIS / Q-01",name:"轴线控制者",line:`W${week} 的重点是让骨盆与核心更稳定。`}:{code:"PULSE / R-03",name:"恢复节律者",line:`W${week} 在训练刺激与恢复之间找到平衡。`};
-  if(!persona)return{...base,accent:top,growth};
-  return{code:`${state.mbti} / ${base.code.split(" / ")[0]}`,name:`${persona.name} · ${base.name}`,line:`${persona.trait}；${growth}。`,accent:top,growth};
+  const baseline=identityBaseline(metrics,persona),training=identityTraining(top,week),carry=`${growth}。`;
+  if(!persona)return{...base,accent:top,growth,baseline,training,carry};
+  return{code:`${state.mbti} / ${base.code.split(" / ")[0]}`,name:`${persona.name} · ${base.name}`,line:`${baseline}${training}${carry}`,accent:top,growth,baseline,training,carry};
 }
+function identityAvatarPath(){return state.identityGender==="female"?"./assets/identity-guardian-female-v1.svg":"./assets/identity-guardian-male-v1.svg";}
 function renderShareIdentity(week,metrics){
   const card=weeklyIdentity(metrics,week), profileTitle=state.profile?findPreset(state.profile.mode,state.profile.preset).title:"长期训练";
-  $("#shareCard").innerHTML=`<div class="identity-card"><div class="identity-no">W${String(week).padStart(2,"0")}</div><div><span>${card.code}</span><h2>${card.name}</h2><p>${card.line}</p>${state.mbti?`<small class="identity-growth">训练重点 · ${card.accent}</small>`:""}</div><div class="identity-foot"><span>${profileTitle}</span><strong>${metrics.values[0]}% 完成 · ${metrics.values[2]} 恢复</strong></div><div class="identity-orbit"><i></i><i></i><i></i></div></div>`;
+  $("#shareCard").innerHTML=`<div class="identity-card"><div class="identity-no">W${String(week).padStart(2,"0")}</div><img class="identity-avatar" src="${identityAvatarPath()}" alt="原创卡通肌肉健康守护者玩偶形象"><div class="identity-content"><span>${card.code}</span><h2>${card.name}</h2><div class="identity-readout"><section><b>01 / 你本身</b><p>${card.baseline}</p></section><section><b>02 / 训练在做什么</b><p>${card.training}</p></section><section><b>03 / 正在带动什么</b><p>${card.carry}</p></section></div></div><div class="identity-foot"><span>${profileTitle} · 重点 ${card.accent}</span><strong>${metrics.values[0]}% 完成 · ${metrics.values[2]} 恢复</strong></div></div>`;
   return card;
 }
 function renderReports(){
@@ -412,7 +428,7 @@ function renderReports(){
   const previous=reportMetrics(Math.max(1,week-1));
   const weekPlan=state.weeks[week-1], activeMuscles=weekPlan.days.flatMap((day,index)=>state.logs[logKey(week,index+1)]?.completed?day.muscles:[]); const labels=activeMuscles.length?activeMuscles:weekPlan.days.filter(d=>d.type==="train").slice(0,2).flatMap(d=>d.muscles);
   $("#reportBodyMap").innerHTML=bodyMapSvg(labels,"report"); $("#bodySignalTag").textContent=metrics.sample?"示例预览 · 记录后替换":"来自本周记录";
-  $("#reportRadar").innerHTML=radarSvg(metrics,previous); $("#mbtiInput").value=state.mbti; renderShareIdentity(week,metrics); $("#shareWeekCard").dataset.week=week;
+  $("#reportRadar").innerHTML=radarSvg(metrics,previous); $("#mbtiInput").value=state.mbti; $("#genderInput").value=state.identityGender; renderShareIdentity(week,metrics); $("#shareWeekCard").dataset.week=week;
 }
 function priorityMuscleMatch(goalTitle,muscle=""){
   if(goalTitle==="三角肌中束")return /三角肌中束/.test(muscle);
@@ -448,11 +464,22 @@ function renderGoals(){
 }
 
 async function shareWeekCard(){
-  const week=Number($("#shareWeekCard").dataset.week||state.week),metrics=reportMetrics(week),identity=weeklyIdentity(metrics,week),canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;const c=canvas.getContext("2d");c.fillStyle="#070707";c.fillRect(0,0,1080,1350);c.fillStyle="#ff4a3d";c.fillRect(72,72,936,12);c.strokeStyle="#292522";c.lineWidth=2;c.strokeRect(72,72,936,1206);c.fillStyle="#9d9690";c.font="700 34px system-ui";c.fillText(`CARBON / WEEK ${String(week).padStart(2,"0")}`,112,150);c.fillStyle="#f2efeb";c.font=state.mbti?"900 64px system-ui":"900 92px system-ui";c.fillText(identity.name,112,300);c.fillStyle="#ff4a3d";c.font="800 40px system-ui";c.fillText(identity.code,112,370);c.fillStyle="#bdb6af";c.font="36px system-ui";wrapCanvasText(c,identity.line,112,460,820,54);const labels=["完成","睡眠","恢复","动作","连续"];metrics.values.forEach((value,index)=>{const y=650+index*92;c.fillStyle="#928b85";c.font="28px system-ui";c.fillText(labels[index],112,y);c.fillStyle="#211f1d";c.fillRect(260,y-24,620,28);c.fillStyle="#ff4a3d";c.fillRect(260,y-24,620*value/100,28);c.fillStyle="#f2efeb";c.font="800 30px system-ui";c.fillText(String(value),910,y);});c.fillStyle="#716b65";c.font="26px system-ui";c.fillText("目标不是一张照片，是下一周仍然能继续的系统。",112,1190);c.fillStyle="#f2efeb";c.font="800 28px system-ui";c.fillText("CARBON TRAINING CONSOLE",112,1240);
+  const week=Number($("#shareWeekCard").dataset.week||state.week),metrics=reportMetrics(week),identity=weeklyIdentity(metrics,week),canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;const c=canvas.getContext("2d"),score=Math.round(metrics.values[0]*.45+metrics.values[2]*.3+metrics.values[3]*.25);let avatar=null;try{avatar=await loadCanvasImage(identityAvatarPath());}catch(_){}
+  c.fillStyle="#060606";c.fillRect(0,0,1080,1350);const glow=c.createRadialGradient(790,330,20,790,330,420);glow.addColorStop(0,"rgba(255,74,61,.25)");glow.addColorStop(1,"rgba(255,74,61,0)");c.fillStyle=glow;c.fillRect(360,0,720,780);c.fillStyle="#ff4a3d";c.fillRect(64,58,952,10);c.strokeStyle="#2b2826";c.lineWidth=2;c.strokeRect(64,58,952,1230);
+  c.fillStyle="#938c86";c.font="800 26px system-ui";c.fillText(`CARBON / WEEK ${String(week).padStart(2,"0")}`,92,120);c.fillStyle="#ff4a3d";c.font="850 29px system-ui";c.fillText(identity.code,92,170);c.fillStyle="#f5f1ed";c.font=state.mbti?"900 52px system-ui":"900 68px system-ui";wrapCanvasText(c,identity.name,92,238,810,66);
+  if(avatar)c.drawImage(avatar,590,150,390,585);
+  c.fillStyle="#ff8278";c.font="850 22px system-ui";c.fillText("01 / 你本身",92,350);c.fillStyle="#c8c1ba";c.font="29px system-ui";wrapCanvasText(c,identity.baseline,92,398,440,43);
+  c.fillStyle="#ff8278";c.font="850 22px system-ui";c.fillText("02 / 训练在做什么",92,555);c.fillStyle="#c8c1ba";c.font="29px system-ui";wrapCanvasText(c,identity.training,92,603,460,43);
+  c.fillStyle="#11100f";c.fillRect(82,790,916,390);c.strokeStyle="#302c29";c.strokeRect(82,790,916,390);
+  c.strokeStyle="#272422";c.lineWidth=28;c.beginPath();c.arc(245,995,112,0,Math.PI*2);c.stroke();c.strokeStyle="#ff4a3d";c.lineCap="round";c.beginPath();c.arc(245,995,112,-Math.PI/2,-Math.PI/2+Math.PI*2*score/100);c.stroke();c.lineCap="butt";c.fillStyle="#f5f1ed";c.font="900 64px system-ui";c.textAlign="center";c.fillText(String(score),245,1015);c.fillStyle="#8e8781";c.font="800 20px system-ui";c.fillText("本周状态",245,1055);c.textAlign="left";
+  c.fillStyle="#ff8278";c.font="850 22px system-ui";c.fillText("03 / 正在带动什么",430,845);c.fillStyle="#ddd6cf";c.font="29px system-ui";wrapCanvasText(c,identity.carry,430,892,500,43);
+  [["完成",metrics.values[0]],["恢复",metrics.values[2]],["动作",metrics.values[3]]].forEach(([label,value],index)=>{const x=430+index*174;c.fillStyle="#1d1b19";c.fillRect(x,1052,154,86);c.fillStyle="#8e8781";c.font="800 19px system-ui";c.fillText(label,x+16,1080);c.fillStyle="#f5f1ed";c.font="900 34px system-ui";c.fillText(String(value),x+16,1122);});
+  c.fillStyle="#716b65";c.font="24px system-ui";c.fillText(`重点肌群 · ${identity.accent}`,92,1230);c.fillStyle="#f2efeb";c.font="800 25px system-ui";c.fillText("CARBON TRAINING CONSOLE",92,1268);
   const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png")); if(!blob)return; const file=new File([blob],`carbon-week-${week}.png`,{type:"image/png"});
   try{if(navigator.share&&navigator.canShare?.({files:[file]})){await navigator.share({title:`${identity.name} · W${week}`,text:identity.line,files:[file]});return;}}catch(error){if(error.name==="AbortError")return;}
   const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=file.name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+function loadCanvasImage(src){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=src;});}
 function wrapCanvasText(ctx,text,x,y,maxWidth,lineHeight){const words=[...text];let line="",lineNo=0;words.forEach((word,index)=>{const test=line+word;if(ctx.measureText(test).width>maxWidth&&line){ctx.fillText(line,x,y+lineNo*lineHeight);line=word;lineNo++;}else line=test;if(index===words.length-1)ctx.fillText(line,x,y+lineNo*lineHeight);});}
 
 function getFoodVariant(category){const entry=state.food[category.id]||{count:0,variant:category.defaultVariant};return category.variants.find(v=>v.id===entry.variant)||category.variants[0];}
@@ -495,7 +522,7 @@ function registerWebMCP(){
     {name:'add_next_week',title:'生成下一周',description:'根据最近一周反馈生成可编辑的新一周，并自动变换训练日顺序。',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(){addNextWeek();const week=state.weeks.length;return{created:true,week,focus:state.weeks[week-1].name,load:state.weeks[week-1].load};}},
     {name:'record_workout_feedback',title:'记录训练反馈',description:'用完成情况、睡眠、低中高酸痛、完成状态和身体感受记录训练。',inputSchema:{type:'object',properties:{week:{type:'integer',minimum:1},day:{type:'integer',minimum:1,maximum:7},completed:{type:'boolean'},sleep:{type:'number',minimum:0,maximum:12},soreness:{type:'string',enum:['low','medium','high']},finish:{type:'string',enum:['easy','just','form_break']},body:{type:'string',enum:['smooth','tight_ok','limited']},notes:{type:'string',maxLength:500}},required:['week','day','completed'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){const week=safeWeek(input),day=Number(input.day);if(!Number.isInteger(day)||day<1||day>7)throw new Error('day 必须是 1 到 7 的整数');state.logs[logKey(week,day)]={...input,updatedAt:new Date().toISOString()};localStorage.setItem('carbonTrainingLogsV2',JSON.stringify(state.logs));autoAdjustPriorities(false);renderAll();return{saved:true,week,day,recommendation:reportCopy(getReport(week).mode),topPriorities:state.goalPriorities.slice(0,3).map(x=>x.title)};}},
     {name:'read_week_report',title:'读取周报',description:'读取指定周的完成率、睡眠与人话版恢复反馈。',inputSchema:{type:'object',properties:{week:{type:'integer',minimum:1}},required:['week'],additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:false},execute(input){const week=safeWeek(input),r=getReport(week);return{week,completionPercent:Math.round(r.completion*100),averageSleep:r.sleep,soreness:r.soreness,finish:r.finish,body:r.body,recommendation:reportCopy(r.mode)};}},
-    {name:'update_training_profile',title:'更新训练目标建档',description:'按增肌塑形或体态调整目标更新方向与备注，并从当前周重算四周计划。',inputSchema:{type:'object',properties:{mode:{type:'string',enum:['muscle','posture']},preset:{type:'string',enum:['combat','upper','balanced','shoulder','hip','whole','headneck','asymmetry','breath']},weight:{type:'number',minimum:35,maximum:200},bodyFat:{type:'number',minimum:3,maximum:50},trainingAge:{type:'string',enum:['starter','regular','experienced']},mbti:{type:'string',enum:['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP']},notes:{type:'string',maxLength:500}},required:['mode','preset'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){const allowed=(profilePresets[input.mode]||[]).some(item=>item.id===input.preset);if(!allowed)throw new Error('preset 与 mode 不匹配');if(input.mbti){state.mbti=input.mbti;localStorage.setItem('carbonMbtiV1',state.mbti);}const {mbti,...profileInput}=input,profile={...(state.profile||{}),...profileInput,images:state.profile?.images||{},updatedAt:new Date().toISOString()};state.profile=profile;localStorage.setItem('carbonProfileV1',JSON.stringify(profile));applyProfileToPlan(profile);renderAll();return{saved:true,focus:findPreset(profile.mode,profile.preset).title,priorities:state.goalPriorities.slice(0,3).map(x=>x.title),weeks:[state.week,state.week+1,state.week+2,state.week+3],mbti:state.mbti||null};}}
+    {name:'update_training_profile',title:'更新训练目标建档',description:'按增肌塑形或体态调整目标更新方向与备注，并从当前周重算四周计划。',inputSchema:{type:'object',properties:{mode:{type:'string',enum:['muscle','posture']},preset:{type:'string',enum:['combat','upper','balanced','shoulder','hip','whole','headneck','asymmetry','breath']},weight:{type:'number',minimum:35,maximum:200},bodyFat:{type:'number',minimum:3,maximum:50},trainingAge:{type:'string',enum:['starter','regular','experienced']},mbti:{type:'string',enum:['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP']},gender:{type:'string',enum:['male','female']},notes:{type:'string',maxLength:500}},required:['mode','preset'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){const allowed=(profilePresets[input.mode]||[]).some(item=>item.id===input.preset);if(!allowed)throw new Error('preset 与 mode 不匹配');if(input.mbti){state.mbti=input.mbti;localStorage.setItem('carbonMbtiV1',state.mbti);}if(input.gender){state.identityGender=input.gender;localStorage.setItem('carbonIdentityGenderV1',state.identityGender);}const {mbti,gender,...profileInput}=input,profile={...(state.profile||{}),...profileInput,images:state.profile?.images||{},updatedAt:new Date().toISOString()};state.profile=profile;localStorage.setItem('carbonProfileV1',JSON.stringify(profile));applyProfileToPlan(profile);renderAll();return{saved:true,focus:findPreset(profile.mode,profile.preset).title,priorities:state.goalPriorities.slice(0,3).map(x=>x.title),weeks:[state.week,state.week+1,state.week+2,state.week+3],mbti:state.mbti||null,gender:state.identityGender};}}
   ];
   tools.forEach(tool=>{try{void Promise.resolve(context.registerTool(tool)).catch(()=>{});}catch(_){}});
 }
@@ -508,6 +535,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   [["goal","#goalImageInput"],["front","#frontImageInput"],["back","#backImageInput"]].forEach(([kind,id])=>$(id).onchange=e=>handleProfileImage(kind,e.target.files?.[0]));
   $("#openProfileFromTargets").onclick=()=>switchView('profile'); $("#autoPrioritySort").onclick=()=>autoAdjustPriorities(true); $("#shareWeekCard").onclick=shareWeekCard;
   $("#mbtiInput").onchange=e=>{state.mbti=e.target.value;localStorage.setItem("carbonMbtiV1",state.mbti);renderReports();};
+  $("#genderInput").onchange=e=>{state.identityGender=e.target.value;localStorage.setItem("carbonIdentityGenderV1",state.identityGender);renderReports();};
   $$('.nav-btn').forEach(btn=>btn.onclick=()=>switchView(btn.dataset.view));
   ["#addWeek","#addWeekHero","#addWeekPlan"].forEach(id=>$(id).onclick=addNextWeek); ["#editWeekHero","#editWeekPlan"].forEach(id=>$(id).onclick=openWeekDialog);
   $("#saveWeekEdit").onclick=saveWeekEdit; $("#saveDayEdit").onclick=saveDayEdit;
