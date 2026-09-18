@@ -537,12 +537,12 @@ button { color: inherit; }
 .body-map { max-width:470px; margin:0 auto; }
 .anatomy-stage { position:relative; aspect-ratio:1086 / 1448; overflow:hidden; border:1px solid #2d2927; border-radius:18px; background:radial-gradient(circle at 50% 34%,rgba(255,74,61,.08),transparent 38%),linear-gradient(160deg,#151312,#050505); isolation:isolate; }
 .anatomy-stage::before { content:""; position:absolute; inset:0; z-index:0; opacity:.2; background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px); background-size:32px 32px; mask-image:linear-gradient(to bottom,black,transparent 80%); }
-.anatomy-stage img { position:absolute; inset:2.5% 2.5% 1%; z-index:1; width:95%; height:96.5%; object-fit:contain; filter:saturate(.68) contrast(1.08) brightness(.82); }
+.anatomy-stage img { position:absolute; inset:2.5% 2.5% 1%; z-index:1; width:95%; height:96.5%; object-fit:contain; filter:saturate(.42) contrast(1.12) brightness(.76); }
 .anatomy-label { position:absolute; z-index:4; top:13px; padding:5px 8px; border-radius:7px; background:rgba(0,0,0,.7); color:#9a938d; font-size:.64rem; font-weight:900; letter-spacing:.12em; }
 .anatomy-label.front { left:12px; }
 .anatomy-label.back { right:12px; }
-.anatomy-hotspot { position:absolute; z-index:3; display:none; pointer-events:none; border:0; background:radial-gradient(ellipse at 50% 48%,rgba(255,102,88,.94) 0%,rgba(255,54,39,.82) 55%,rgba(255,48,34,.3) 78%,transparent 100%); box-shadow:none; mix-blend-mode:screen; filter:saturate(1.45) brightness(1.18); opacity:.66; }
-.anatomy-hotspot.active { display:block; animation:anatomyPulse 1.7s ease-in-out infinite; }
+.anatomy-hotspot { position:absolute; z-index:3; display:none; pointer-events:none; border:0; background:repeating-linear-gradient(108deg,rgba(255,210,195,.12) 0 1px,transparent 1px 5px),linear-gradient(138deg,rgba(92,8,8,.54),rgba(235,54,40,.78) 48%,rgba(105,12,10,.5)); background-blend-mode:screen,normal; box-shadow:none; mix-blend-mode:screen; filter:saturate(1.2) contrast(1.1); opacity:.7; }
+.anatomy-hotspot.active { display:block; }
 .anatomy-hotspot.upperChest { left:14.5%; top:16.5%; width:27%; height:8%; clip-path:polygon(5% 18%,50% 0,95% 18%,88% 82%,50% 62%,12% 82%); }
 .anatomy-hotspot.chest { left:12%; top:20%; width:32%; height:12%; clip-path:polygon(5% 0,48% 5%,50% 90%,4% 74%,0 30%,95% 0,100% 30%,96% 74%,52% 90%,52% 5%); }
 .anatomy-hotspot.sideDelt.left { left:7.2%; top:17.3%; width:8.6%; height:11.4%; border-radius:49% 48% 54% 45%; transform:rotate(14deg); }
@@ -557,12 +557,11 @@ button { color: inherit; }
 .anatomy-hotspot.lats { left:59%; top:23%; width:36%; height:22%; clip-path:polygon(0 0,100% 0,76% 100%,50% 78%,24% 100%); }
 .anatomy-hotspot.glutes { left:65%; top:40%; width:28%; height:14%; clip-path:polygon(3% 8%,48% 0,50% 100%,0 82%,52% 0,97% 8%,100% 82%,50% 100%); }
 .anatomy-hotspot.hamstrings { left:65%; top:51%; width:28%; height:20%; clip-path:polygon(0 0,46% 0,48% 100%,5% 92%,54% 0,100% 0,95% 92%,52% 100%); }
-@keyframes anatomyPulse { 0%,100% { opacity:.46; filter:saturate(1.3) brightness(1.02); } 50% { opacity:.9; filter:saturate(1.75) brightness(1.62); } }
 .map-targets { display:flex; flex-wrap:wrap; gap:5px; margin:9px 0 7px; }
 .map-targets span { padding:4px 7px; border:1px solid rgba(255,74,61,.28); border-radius:999px; background:rgba(255,74,61,.08); color:#ffaaa3; font-size:.67rem; }
 .map-legend { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:.75rem; }
 .map-legend span { display:flex; align-items:center; gap:6px; }
-.pulse-dot { width:8px; height:8px; border-radius:50%; background:var(--red); box-shadow:0 0 10px var(--red); }
+.pulse-dot { width:14px; height:3px; border-radius:999px; background:linear-gradient(90deg,#7c1712,var(--red)); box-shadow:none; }
 
 .report-visual-layout { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0; }
 .visual-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
