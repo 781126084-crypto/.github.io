@@ -535,33 +535,31 @@ button { color: inherit; }
 .muscle-focus-panel h3 { margin:6px 0; font-size:1.25rem; }
 .muscle-focus-panel p { margin:0; color:var(--muted); font-size:.88rem; }
 .body-map { max-width:470px; margin:0 auto; }
-.anatomy-stage { position:relative; aspect-ratio:1086 / 1448; overflow:hidden; border:1px solid #2d2927; border-radius:18px; background:radial-gradient(circle at 50% 34%,rgba(255,74,61,.08),transparent 38%),linear-gradient(160deg,#151312,#050505); isolation:isolate; }
-.anatomy-stage::before { content:""; position:absolute; inset:0; z-index:0; opacity:.2; background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px); background-size:32px 32px; mask-image:linear-gradient(to bottom,black,transparent 80%); }
-.anatomy-stage img { position:absolute; inset:2.5% 2.5% 1%; z-index:1; width:95%; height:96.5%; object-fit:contain; filter:saturate(.42) contrast(1.12) brightness(.76); }
-.anatomy-label { position:absolute; z-index:4; top:13px; padding:5px 8px; border-radius:7px; background:rgba(0,0,0,.7); color:#9a938d; font-size:.64rem; font-weight:900; letter-spacing:.12em; }
-.anatomy-label.front { left:12px; }
-.anatomy-label.back { right:12px; }
-.anatomy-hotspot { position:absolute; z-index:3; display:none; pointer-events:none; border:0; background:repeating-linear-gradient(108deg,rgba(255,210,195,.12) 0 1px,transparent 1px 5px),linear-gradient(138deg,rgba(92,8,8,.54),rgba(235,54,40,.78) 48%,rgba(105,12,10,.5)); background-blend-mode:screen,normal; box-shadow:none; mix-blend-mode:screen; filter:saturate(1.2) contrast(1.1); opacity:.7; }
-.anatomy-hotspot.active { display:block; }
-.anatomy-hotspot.upperChest { left:14.5%; top:16.5%; width:27%; height:8%; clip-path:polygon(5% 18%,50% 0,95% 18%,88% 82%,50% 62%,12% 82%); }
-.anatomy-hotspot.chest { left:12%; top:20%; width:32%; height:12%; clip-path:polygon(5% 0,48% 5%,50% 90%,4% 74%,0 30%,95% 0,100% 30%,96% 74%,52% 90%,52% 5%); }
-.anatomy-hotspot.sideDelt.left { left:7.2%; top:17.3%; width:8.6%; height:11.4%; border-radius:49% 48% 54% 45%; transform:rotate(14deg); }
-.anatomy-hotspot.sideDelt.right { left:41.5%; top:17.3%; width:8.6%; height:11.4%; border-radius:48% 49% 45% 54%; transform:rotate(-14deg); }
-.anatomy-hotspot.arms.left { left:1.5%; top:24%; width:11%; height:27%; clip-path:polygon(40% 0,76% 3%,94% 38%,70% 100%,32% 94%,5% 42%); transform:rotate(8deg); }
-.anatomy-hotspot.arms.right { left:45%; top:24%; width:11%; height:27%; clip-path:polygon(60% 0,24% 3%,6% 38%,30% 100%,68% 94%,95% 42%); transform:rotate(-8deg); }
-.anatomy-hotspot.core { left:17%; top:28%; width:23%; height:20%; clip-path:polygon(12% 0,88% 0,78% 100%,22% 100%); }
-.anatomy-hotspot.quads { left:11%; top:47%; width:35%; height:22%; clip-path:polygon(8% 0,45% 2%,49% 100%,2% 90%,55% 2%,92% 0,98% 90%,51% 100%); }
-.anatomy-hotspot.rearDelt.left { left:55.2%; top:17.2%; width:9%; height:11.4%; border-radius:48% 52% 48% 55%; transform:rotate(-13deg); }
-.anatomy-hotspot.rearDelt.right { left:85.8%; top:17.2%; width:9%; height:11.4%; border-radius:52% 48% 55% 48%; transform:rotate(13deg); }
-.anatomy-hotspot.midBack { left:63%; top:13%; width:29%; height:22%; clip-path:polygon(8% 0,92% 0,72% 100%,50% 78%,28% 100%); }
-.anatomy-hotspot.lats { left:59%; top:23%; width:36%; height:22%; clip-path:polygon(0 0,100% 0,76% 100%,50% 78%,24% 100%); }
-.anatomy-hotspot.glutes { left:65%; top:40%; width:28%; height:14%; clip-path:polygon(3% 8%,48% 0,50% 100%,0 82%,52% 0,97% 8%,100% 82%,50% 100%); }
-.anatomy-hotspot.hamstrings { left:65%; top:51%; width:28%; height:20%; clip-path:polygon(0 0,46% 0,48% 100%,5% 92%,54% 0,100% 0,95% 92%,52% 100%); }
+.muscle-3d-stage { position:relative; aspect-ratio:4 / 5; min-height:410px; overflow:hidden; border:1px solid #302b28; border-radius:18px; background:radial-gradient(circle at 50% 35%,rgba(122,31,24,.28),transparent 36%),linear-gradient(155deg,#151311 0%,#070707 56%,#030303 100%); isolation:isolate; cursor:grab; touch-action:none; }
+.muscle-3d-stage:active { cursor:grabbing; }
+.muscle-3d-stage::before { content:""; position:absolute; inset:0; z-index:0; pointer-events:none; background:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px); background-size:32px 32px; mask-image:linear-gradient(to bottom,black,transparent 78%); }
+.muscle-3d-stage::after { content:""; position:absolute; left:15%; right:15%; bottom:6%; height:18%; z-index:0; pointer-events:none; border-radius:50%; background:radial-gradient(ellipse,rgba(255,74,61,.14),transparent 68%); filter:blur(10px); }
+.muscle-3d-canvas { position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; outline:0; }
+.muscle-3d-loading { position:absolute; inset:0; z-index:5; display:grid; place-content:center; justify-items:center; gap:12px; color:#8f8882; background:linear-gradient(155deg,#151311,#050505); font-size:.78rem; letter-spacing:.08em; transition:opacity .35s ease; }
+.muscle-3d-loading span { width:30px; height:30px; border:2px solid #302c29; border-top-color:var(--red); border-radius:50%; animation:viewerSpin .9s linear infinite; }
+.muscle-3d-stage.ready .muscle-3d-loading { opacity:0; pointer-events:none; }
+.muscle-3d-stage.fallback .muscle-3d-loading { opacity:1; padding:18px; text-align:center; letter-spacing:0; }
+.muscle-3d-stage.fallback .muscle-3d-loading span { display:none; }
+.muscle-3d-stage.fallback .muscle-3d-loading img { width:82%; max-height:82%; object-fit:contain; filter:saturate(.72) contrast(1.08); }
+@keyframes viewerSpin { to { transform:rotate(360deg); } }
+.muscle-3d-badge { position:absolute; z-index:3; left:13px; top:13px; display:flex; align-items:center; gap:7px; padding:6px 9px; border:1px solid rgba(255,255,255,.08); border-radius:9px; background:rgba(6,6,6,.7); backdrop-filter:blur(10px); pointer-events:none; }
+.muscle-3d-badge b { color:var(--red); font-size:.76rem; letter-spacing:.08em; }
+.muscle-3d-badge span { color:#9d9690; font-size:.72rem; font-weight:900; letter-spacing:.1em; }
+.muscle-3d-controls { position:absolute; z-index:4; right:12px; top:12px; display:flex; gap:5px; }
+.muscle-3d-controls button { min-height:36px; padding:6px 10px; border:1px solid rgba(255,255,255,.1); border-radius:8px; background:rgba(7,7,7,.76); color:#b8b0a9; cursor:pointer; font-size:.76rem; font-weight:800; backdrop-filter:blur(10px); }
+.muscle-3d-controls button:hover { border-color:rgba(255,74,61,.5); color:#fff; }
+.muscle-3d-hint { position:absolute; z-index:3; left:50%; bottom:12px; transform:translateX(-50%); padding:6px 9px; border-radius:999px; background:rgba(6,6,6,.62); color:#817a74; font-size:.72rem; white-space:nowrap; pointer-events:none; backdrop-filter:blur(8px); }
 .map-targets { display:flex; flex-wrap:wrap; gap:5px; margin:9px 0 7px; }
 .map-targets span { padding:4px 7px; border:1px solid rgba(255,74,61,.28); border-radius:999px; background:rgba(255,74,61,.08); color:#ffaaa3; font-size:.67rem; }
 .map-legend { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:.75rem; }
 .map-legend span { display:flex; align-items:center; gap:6px; }
-.pulse-dot { width:14px; height:3px; border-radius:999px; background:linear-gradient(90deg,#7c1712,var(--red)); box-shadow:none; }
+.pulse-dot { width:8px; height:8px; border-radius:50%; background:var(--red); box-shadow:0 0 0 4px rgba(255,74,61,.13),0 0 15px rgba(255,74,61,.55); animation:legendBreath 1.9s ease-in-out infinite; }
+@keyframes legendBreath { 50% { opacity:.48; transform:scale(.84); } }
 
 .report-visual-layout { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0; }
 .visual-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
@@ -645,9 +643,12 @@ button { color: inherit; }
   .priority-primary,.priority-secondary { grid-template-columns:1fr; }
   .priority-more summary { align-items:flex-start; flex-direction:column; }
   .target-actions { width:100%; justify-content:flex-start; }
-  .anatomy-stage { border-radius:14px; }
+  .muscle-3d-stage { min-height:390px; border-radius:14px; }
   .map-legend { align-items:flex-start; flex-direction:column; }
   .training-section-head { align-items:stretch; flex-direction:column; }
   .venue-switch { width:100%; }
   .identity-card h2 { max-width:90%; font-size:1.65rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .muscle-3d-loading span,.pulse-dot { animation:none; }
 }
