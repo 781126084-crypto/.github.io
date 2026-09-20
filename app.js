@@ -300,6 +300,7 @@ function renderProfileResult(){
   if(!profile){box.innerHTML=`<div class="profile-empty"><div class="empty-orbit"><span></span></div><div class="eyebrow">WAITING FOR SIGNAL</div><h2>你的训练重点还没被计算。</h2><p>先选目标方向。目标图、正背面照片和数据越完整，优先级越贴近你。</p><div class="empty-checks"><span>01 目标结构</span><span>02 当前基础</span><span>03 四周路径</span></div></div>`;return;}
   const preset=findPreset(profile.mode,profile.preset), top=state.goalPriorities.slice(0,3);
   box.innerHTML=`<div class="result-card"><div class="visual-head"><div><div class="eyebrow">PROFILE LOCKED</div><h2>${preset.title}</h2></div><span class="status-chip green">已同步计划</span></div><p>${profilePriorityReason(profile,preset)}</p>${bodyMapSvg(top.map(x=>x.title),"profile")}<div class="priority-stack">${top.map((item,index)=>`<div><span>0${index+1}</span><strong>${item.title}</strong><small>${index===0?"主重点":"支持位"}</small></div>`).join("")}</div><div class="profile-mini-data"><span>${profile.mode==="muscle"?"增肌塑形":"体态调整"}</span><span>${profile.weight?`${profile.weight} kg`:"体重未填"}</span><span>${profile.trainingAge==="experienced"?"1 年以上":profile.trainingAge==="regular"?"3–12 个月":"起步阶段"}</span></div>${profileImages.goal?`<div class="reference-thumb"><img src="${profileImages.goal}" alt="目标参考"><span>目标参考</span></div>`:""}</div>`;
+  refreshMuscle3D();
 }
 function renderProfile(){
   const profile=state.profile, mode=profile?.mode||document.querySelector('input[name="profileMode"]:checked')?.value||"muscle";
@@ -331,9 +332,14 @@ function muscleFlags(labels=[]){
   return {upperChest:/上胸/.test(text),chest:/胸大肌/.test(text),sideDelt:/中束|肩宽/.test(text),rearDelt:/后束/.test(text),lats:/背阔|大圆/.test(text),midBack:/斜方|菱形|肩胛|胸椎/.test(text),arms:/二头|三头/.test(text),core:/核心|腹部/.test(text),quads:/股四|腿前/.test(text),glutes:/臀|髋/.test(text),hamstrings:/腘绳|后链/.test(text)};
 }
 function bodyMapSvg(labels=[],variant="day"){
-  const f=muscleFlags(labels), hot=key=>`anatomy-hotspot ${key} ${f[key]?"active":""}`, lower=f.quads||f.glutes||f.hamstrings;
+  const f=muscleFlags(labels), lower=f.quads||f.glutes||f.hamstrings;
   const activeLabels=labels.slice(0,4).map(label=>`<span>${escapeHtml(label)}</span>`).join("");
-  return `<div class="body-map anatomy-map ${lower?"lower-map":"upper-map"} ${variant}"><div class="anatomy-stage" role="img" aria-label="正面与背面肌肉纤维图，静态深红纤维染色标示本次目标肌群"><img src="./assets/anatomy-muscle-map.svg" alt="正面和背面人体肌肉纤维解剖图"><i class="${hot("upperChest")}"></i><i class="${hot("chest")}"></i><i class="${hot("sideDelt")} left"></i><i class="${hot("sideDelt")} right"></i><i class="${hot("arms")} left"></i><i class="${hot("arms")} right"></i><i class="${hot("core")}"></i><i class="${hot("quads")}"></i><i class="${hot("rearDelt")} left"></i><i class="${hot("rearDelt")} right"></i><i class="${hot("midBack")}"></i><i class="${hot("lats")}"></i><i class="${hot("glutes")}"></i><i class="${hot("hamstrings")}"></i><span class="anatomy-label front">FRONT / 正面</span><span class="anatomy-label back">BACK / 背面</span></div><div class="map-targets">${activeLabels||"<span>恢复与位置感</span>"}</div><div class="map-legend"><span><i class="pulse-dot"></i>深红纤维染色＝本次重点</span><span>用于位置识别，不作医学诊断</span></div></div>`;
+  const flags=Object.entries(f).filter(([,active])=>active).map(([key])=>key).join(",");
+  return `<div class="body-map muscle-3d-map ${lower?"lower-map":"upper-map"} ${variant}"><div class="muscle-3d-stage" data-muscles="${flags}"><canvas class="muscle-3d-canvas" aria-label="可拖动旋转的三维肌肉人体，红色呼吸区域为本次目标肌群"></canvas><div class="muscle-3d-loading"><span></span><strong>正在建立 3D 肌肉模型</strong></div><div class="muscle-3d-badge"><b>3D</b><span>ACTIVE MUSCLE</span></div><div class="muscle-3d-controls"><button type="button" data-muscle-action="toggle">暂停旋转</button><button type="button" data-muscle-action="reset">复位</button></div><div class="muscle-3d-hint">拖动旋转 · 滚轮缩放</div></div><div class="map-targets">${activeLabels||"<span>恢复与位置感</span>"}</div><div class="map-legend"><span><i class="pulse-dot"></i>红色呼吸＝本次重点肌群</span><span>拖动查看正面、侧面和背面</span></div></div>`;
+}
+function refreshMuscle3D(){
+  requestAnimationFrame(()=>document.dispatchEvent(new CustomEvent("carbon:muscle3d")));
+  setTimeout(()=>document.querySelectorAll(".muscle-3d-stage:not(.ready):not(.fallback)").forEach(stage=>{const loading=stage.querySelector(".muscle-3d-loading");stage.classList.add("fallback");loading.innerHTML='<img src="./assets/anatomy-muscle-map.svg" alt="正面与背面人体肌肉图"><strong>3D 未能载入，已显示平面定位图</strong>';}),8000);
 }
 
 function renderWeekSwitcher() {
@@ -399,6 +405,7 @@ function renderDayDetail() {
   $("#dayDetail").innerHTML=`<div class="detail-head"><div><div class="eyebrow">DAY ${String(state.day).padStart(2,"0")} · ${day.type==="train"?"TRAIN":"RECOVER"}</div><h2>${day.short}</h2><p>${day.why}</p><div class="muscle-row">${day.muscles.map(m=>`<span class="muscle-chip">${m}</span>`).join("")}</div></div><div class="detail-actions"><span class="status-chip ${day.type==="train"?"red":"green"}">${day.focus}</span><button class="ghost-btn" id="editCurrentDay" type="button">编辑当天</button></div></div><section class="muscle-focus-panel"><div><div class="section-kicker">TARGET MAP · 发力位置</div><h3>${day.type==="train"?"亮起的区域，是今天应该优先感受到的位置":"今天只让这些区域恢复顺畅"}</h3><p>${day.type==="train"?"先在图上建立位置感，再用轻重量热身确认；关节疼痛不等于目标肌群发力。":"红色区域只作活动方向提示，不追求疲劳或极限幅度。"}</p></div>${bodyMapSvg(day.muscles)}</section>${train}${renderMobility(day.mobility)}`;
   $("#editCurrentDay").onclick=()=>openDayDialog(state.day);
   $$('[data-venue]').forEach(button=>button.onclick=()=>{state.trainingVenue=button.dataset.venue;localStorage.setItem("carbonTrainingVenueV1",state.trainingVenue);renderDayDetail();});
+  refreshMuscle3D();
 }
 
 function loadLogForm() { const log=state.logs[logKey(state.week,state.day)]||{}; $("#completedInput").checked=Boolean(log.completed); ["sleep","soreness","finish","body","notes"].forEach(key=>{const el=$(`#${key}Input`);if(el)el.value=log[key]??"";}); $("#saveNote").textContent=""; }
@@ -488,6 +495,7 @@ function renderReports(){
   const previous=reportMetrics(Math.max(1,week-1));
   const weekPlan=state.weeks[week-1], activeMuscles=weekPlan.days.flatMap((day,index)=>state.logs[logKey(week,index+1)]?.completed?day.muscles:[]); const labels=activeMuscles.length?activeMuscles:weekPlan.days.filter(d=>d.type==="train").slice(0,2).flatMap(d=>d.muscles);
   $("#reportBodyMap").innerHTML=bodyMapSvg(labels,"report"); $("#bodySignalTag").textContent=metrics.sample?"示例预览 · 记录后替换":"来自本周记录";
+  refreshMuscle3D();
   $("#reportRadar").innerHTML=radarSvg(metrics,previous); $("#mbtiInput").value=state.mbti; $("#genderInput").value=state.identityGender; renderShareIdentity(week,metrics); $("#shareWeekCard").dataset.week=week;
 }
 function priorityMuscleMatch(goalTitle,muscle=""){
