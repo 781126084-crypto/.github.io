@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#070707">
   <meta name="description" content="可持续生成、编辑与复盘的长期训练控制台。"><title>CARBON 长期训练控制台</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23070707'/%3E%3Cpath d='M14 18h36v9H23v10h27v9H14z' fill='%23ff4a3d'/%3E%3C/svg%3E"><link rel="stylesheet" href="./styles.css?v=10">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23070707'/%3E%3Cpath d='M14 18h36v9H23v10h27v9H14z' fill='%23ff4a3d'/%3E%3C/svg%3E"><link rel="stylesheet" href="./styles.css?v=11">
 </head>
 <body>
 <main class="app-shell">
@@ -65,5 +65,6 @@
 
 <dialog id="dayDialog" class="edit-dialog wide"><form method="dialog" id="dayForm"><div class="dialog-head"><div><div class="eyebrow">EDIT DAY</div><h2 id="dayDialogTitle">编辑训练日</h2></div><button class="icon-btn" value="cancel" aria-label="关闭">×</button></div><div class="dialog-body"><div class="form-grid"><div class="field"><label for="dayTypeInput">模块类型</label><select id="dayTypeInput"><option value="train">训练</option><option value="rest">恢复</option></select></div><div class="field"><label for="dayNameInput">当天主题</label><input id="dayNameInput" maxlength="36"></div><div class="field full"><label for="dayFocusInput">当天目的</label><input id="dayFocusInput" maxlength="70"></div><div class="field full"><label for="dayMusclesInput">核心肌群（用顿号或逗号分隔）</label><input id="dayMusclesInput" maxlength="180"></div></div><div id="trainEditor"><div class="editor-section-head"><div><h3>主训练 · 最多 5 个动作</h3><p>先选核心肌群，再筛选动作；也可以直接输入自己的动作。</p></div><button class="ghost-btn" id="addExercise" type="button">＋ 加动作</button></div><div class="exercise-editor-list" id="exerciseEditorList"></div></div><div class="editor-section-head"><div><h3>独立辅助 · 20–30 分钟</h3><p>保留 3 个动作，每个动作写清楚怎么做和做多久。</p></div></div><div class="mobility-editor-list" id="mobilityEditorList"></div></div><div class="dialog-actions"><button class="ghost-btn" value="cancel">取消</button><button class="primary-btn compact" id="saveDayEdit" value="default">保存当天</button></div></form></dialog>
 
-<script src="./app.js?v=10"></script>
+<script type="module" src="./muscle-3d.js?v=11"></script>
+<script src="./app.js?v=11"></script>
 </body></html>
